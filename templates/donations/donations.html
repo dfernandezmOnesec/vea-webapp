@@ -42,14 +42,23 @@
                             <tbody>
                                 {% for donation in donations %}
                                 <tr>
-                                    <td>{{ donation.title|default:donation.get_type_display }}</td>
                                     <td>
-                                        <span class="badge {% if donation.type == 'monetaria' %}bg-success
-                                            {% elif donation.type == 'especie' %}bg-info
-                                            {% elif donation.type == 'medicamentos' %}bg-warning text-dark
-                                            {% elif donation.type == 'voluntariado' %}bg-primary
+                                        {% if donation.title %}
+                                            {{ donation.title }}
+                                        {% elif donation.donation_type %}
+                                            {{ donation.donation_type.name }}
+                                        {% else %}
+                                            Sin tipo
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if donation.donation_type and donation.donation_type.name == 'Monetaria' %}bg-success
+                                            {% elif donation.donation_type and donation.donation_type.name == 'En especie' %}bg-info
+                                            {% elif donation.donation_type and donation.donation_type.name == 'Medicamentos' %}bg-warning text-dark
+                                            {% elif donation.donation_type and donation.donation_type.name == 'Voluntariado' %}bg-primary
                                             {% else %}bg-secondary{% endif %}">
-                                            {{ donation.get_type_display }}
+                                            {% if donation.donation_type %}{{ donation.donation_type.name }}{% else %}Sin tipo{% endif %}
                                         </span>
                                     </td>
                                     <td>
@@ -66,7 +75,7 @@
                                     <td class="text-center">
                                         {% if user.is_superuser or donation.created_by == user %}
                                         <a href="{% url 'donations:edit' donation.pk %}" class="btn btn-sm btn-warning me-1" title="Editar"><i class="fas fa-edit"></i></a>
-                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-donation-id="{{ donation.pk }}" data-donation-title="{{ donation.title|default:donation.get_type_display }}" title="Eliminar"><i class="fas fa-trash"></i></button>
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-donation-id="{{ donation.pk }}" data-donation-title="{% if donation.title %}{{ donation.title }}{% elif donation.donation_type %}{{ donation.donation_type.name }}{% else %}Sin tipo{% endif %}" title="Eliminar"><i class="fas fa-trash"></i></button>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -88,27 +97,7 @@
             </div>
         </div>
         <!-- Menú lateral a la derecha -->
-        <div class="col-lg-3 mb-4 order-lg-2 order-1" style="margin-top: 5.1rem;">
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">Filtros</h5>
-                </div>
-                <div class="card-body">
-                    <form method="get" class="mb-3">
-                        <div class="mb-3">
-                            <label class="form-label">Tipo de Donación</label>
-                            <select name="type" class="form-select">
-                                <option value="">Todos</option>
-                                {% for type_value, type_label in donation_types %}
-                                    <option value="{{ type_value }}" {% if type_value == selected_type %}selected{% endif %}>{{ type_label }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <button type="submit" class="btn w-100 d-block mx-auto" style="background-color:#1a237e; color:#fff; max-width: 200px;">Filtrar</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+        <!-- Eliminado: col-lg-3 con filtros -->
     </div>
 </div>
 
@@ -147,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const deleteForm = deleteModal.querySelector('#deleteForm');
             
             modalTitle.textContent = donationTitle;
-            deleteForm.action = `/donations/delete/${donationId}/`;
+            deleteForm.action = `/donations/${donationId}/delete/`;
         });
     }
 });

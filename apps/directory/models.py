@@ -4,7 +4,7 @@ from django.db import models
 
 class Contact(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nombre")
-    role = models.CharField(max_length=100, verbose_name="Rol")
+    role = models.CharField(max_length=100, verbose_name="Rol", blank=True, null=True)
     ministry = models.CharField(max_length=150, verbose_name="Ministerio")
     contact = models.CharField(max_length=100, verbose_name="Contacto")
     created_at = models.DateTimeField(auto_now_add=True)

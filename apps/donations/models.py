@@ -5,6 +5,12 @@ from django.utils.translation import gettext_lazy as _
 
 
 
+class DonationType(models.Model):
+    name = models.CharField(max_length=50, unique=True, verbose_name=_('Nombre del tipo de donación'))
+    def __str__(self):
+        return self.name
+
+
 class Donation(models.Model):
     TYPE_CHOICES = [
         ('monetaria', _('Monetaria')),
@@ -28,9 +34,11 @@ class Donation(models.Model):
         null=True,
         verbose_name=_('Título')
     )
-    type = models.CharField(
-        max_length=20,
-        choices=TYPE_CHOICES,
+    donation_type = models.ForeignKey(
+        'DonationType',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         verbose_name=_('Tipo de donación')
     )
     amount = models.DecimalField(
@@ -64,12 +72,6 @@ class Donation(models.Model):
         null=True,
         verbose_name=_('Banco')
     )
-    number = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-        verbose_name=_('Número de cuenta')
-    )
     clabe = models.CharField(
         max_length=50,
         blank=True,
@@ -86,15 +88,14 @@ class Donation(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         verbose_name=_('Creado por')
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
+        null=True,
+        blank=True,
         verbose_name=_('Fecha de creación')
-    )
-    updated_at = models.DateTimeField(
-        auto_now=True,
-        verbose_name=_('Fecha de actualización')
     )
 
     class Meta:
@@ -103,5 +104,5 @@ class Donation(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.title or self.get_type_display()} - {self.created_at.strftime('%d/%m/%Y')}"
+        return f"{self.title or self.get_donation_type_display()} - {self.created_at.strftime('%d/%m/%Y')}"
         

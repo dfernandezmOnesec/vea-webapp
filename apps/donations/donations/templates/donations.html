@@ -48,14 +48,13 @@
                     <tbody>
                         {% for donation in donations %}
                         <tr>
-                            <td>{{ donation.title }}</td>
+                            <td>{{ donation.title|default:donation.get_donation_type_display }}</td>
                             <td>
-                                <span class="badge
-                                    {% if donation.donation_type == 'monetaria' %}bg-success
+                                <span class="badge {% if donation.donation_type == 'monetaria' %}bg-success
+                                    {% elif donation.donation_type == 'especie' %}bg-info
                                     {% elif donation.donation_type == 'medicamentos' %}bg-warning text-dark
-                                    {% elif donation.donation_type == 'voluntariado' %}bg-info
-                                    {% else %}bg-secondary
-                                    {% endif %}">
+                                    {% elif donation.donation_type == 'voluntariado' %}bg-primary
+                                    {% else %}bg-secondary{% endif %}">
                                     {{ donation.get_donation_type_display }}
                                 </span>
                             </td>

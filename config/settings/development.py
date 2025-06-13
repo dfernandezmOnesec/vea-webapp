@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
 from .base import *
+import dj_database_url
+import urllib.parse
 
 # Cargar variables de entorno desde el archivo .env (solo en desarrollo local)
 load_dotenv()
@@ -13,17 +15,18 @@ BLOB_CONTAINER_NAME = os.getenv('BLOB_CONTAINER_NAME')
 # Debug settings
 DEBUG = True
 
-# Base de datos SQLite para desarrollo
-import dj_database_url
-
+# Base de datos PostgreSQL para desarrollo
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'vea_connect',
-        'USER': 'vea_user',
-        'PASSWORD': 'vea_pass',
-        'HOST': 'localhost',
+        'USER': 'twsugyiaxf',
+        'PASSWORD': 'E72$rhqEdm6b9oaI',
+        'HOST': 'micrositio-vea-connect-server.postgres.database.azure.com',
         'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require'
+        }
     }
 }
 

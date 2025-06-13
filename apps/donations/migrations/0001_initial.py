@@ -24,7 +24,6 @@ class Migration(migrations.Migration):
                 ('clabe', models.CharField(blank=True, max_length=50, null=True, verbose_name='CLABE')),
                 ('location', models.CharField(blank=True, max_length=200, null=True, verbose_name='Ubicación')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Fecha de actualización')),
             ],
             options={
                 'verbose_name': 'Donación',

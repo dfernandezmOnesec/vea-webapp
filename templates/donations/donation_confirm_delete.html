@@ -15,7 +15,7 @@
             </div>
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
-                    <p class="mb-4">¿Estás seguro de que deseas eliminar la donación "{{ donation.title|default:donation.get_type_display }}"?</p>
+                    <p class="mb-4">¿Estás seguro de que deseas eliminar la donación "{{ donation.title|default:donation.donation_type.name }}"?</p>
                     <form method="post">
                         {% csrf_token %}
                         <div class="d-flex justify-content-center">

@@ -10,12 +10,20 @@ import datetime
 from django.http import HttpResponseRedirect
 from django.db import models
 
+@login_required
 def upload_document(request):
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
             document = form.save(commit=False)
-            document.owner = request.user
+            document.user = request.user
+            if not document.date:
+                document.date = datetime.datetime.now()
+            # Obtener la extensión del archivo
+            file_name = request.FILES['file'].name
+            file_extension = file_name.split('.')[-1].lower()
+            document.file_type = file_extension
+            document.is_processed = False
             document.save()
             messages.success(request, f"El documento '{document.title}' se subió correctamente.")
             return redirect('documents:document_list')
@@ -48,7 +56,7 @@ def document_list(request):
 
 @login_required
 def edit_document(request, pk):
-    document = get_object_or_404(Document, pk=pk, owner=request.user)
+    document = get_object_or_404(Document, pk=pk, user=request.user)
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES, instance=document)
         if form.is_valid():
@@ -61,7 +69,7 @@ def edit_document(request, pk):
 
 @login_required
 def delete_document(request, pk):
-    document = get_object_or_404(Document, pk=pk, owner=request.user)
+    document = get_object_or_404(Document, pk=pk, user=request.user)
     if request.method == 'POST':
         document.file.delete(save=False)  # Borra el archivo del storage
         document.delete()

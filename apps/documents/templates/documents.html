@@ -45,7 +45,7 @@
                                 {% for doc in documents %}
                                 <tr>
                                     <td>{{ doc.title }}</td>
-                                    <td>{{ doc.uploaded_at|date:"d/m/Y" }}</td>
+                                    <td>{{ doc.date|date:"d/m/Y" }}</td>
                                     <td>{{ doc.get_category_display }}</td>
                                     <td>{{ doc.description }}</td>
                                     <td class="text-center">

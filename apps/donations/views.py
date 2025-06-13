@@ -13,20 +13,20 @@ def donation_list(request):
     Incluye búsqueda por título, tipo y entidad.
     """
     query = request.GET.get('q', '').strip()
-    donation_type = request.GET.get('type', '').strip()
+    donation_type = request.GET.get('donation_type', '').strip()
     
     donations = Donation.objects.all()
     
     if query:
         donations = donations.filter(
             Q(title__icontains=query) |
-            Q(type__icontains=query) |
+            Q(donation_type__icontains=query) |
             Q(entity__icontains=query) |
             Q(description__icontains=query)
         )
     
     if donation_type:
-        donations = donations.filter(type=donation_type)
+        donations = donations.filter(donation_type=donation_type)
     
     context = {
         'donations': donations,
