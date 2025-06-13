@@ -1,0 +1,121 @@
+{% extends 'core/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Directorio{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="row g-4">
+        <!-- Contenido principal a la izquierda -->
+        <div class="col-lg-9 mb-4 order-lg-1 order-2">
+            <div class="d-flex justify-content-between align-items-center my-4">
+                <h2 class="fw-bold d-flex align-items-center mb-0" style="color:#1a237e; text-align:left;">
+                    <i class="fa fa-address-book me-2" style="color:#1a237e; font-size:1.5rem;"></i>
+                    Directorio
+                </h2>
+                <a href="{% url 'directory:create' %}" class="btn" style="background-color:#1a237e; color:#fff;">
+                    <i class="fa fa-plus me-1"></i> Nuevo contacto
+                </a>
+            </div>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <form method="get" class="input-group mb-3" action="">
+                        <input type="text" name="q" class="form-control" placeholder="Buscar por nombre, rol, ministerio o contacto..." value="{{ q|default:'' }}">
+                        {% if selected_ministry %}
+                            <input type="hidden" name="ministry" value="{{ selected_ministry }}">
+                        {% endif %}
+                        <button class="btn btn-outline-dark" type="submit">
+                            <i class="fas fa-search me-1"></i> Buscar
+                        </button>
+                    </form>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Rol</th>
+                                    <th>Ministerio</th>
+                                    <th>Contacto</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for contact in contacts %}
+                                <tr>
+                                    <td>{{ contact.name }}</td>
+                                    <td>{{ contact.role }}</td>
+                                    <td>{{ contact.ministry }}</td>
+                                    <td>{{ contact.contact }}</td>
+                                    <td class="text-center">
+                                        <a href="{% url 'directory:edit' contact.pk %}" class="btn btn-sm btn-warning me-1" title="Editar"><i class="fas fa-edit"></i></a>
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-contact-id="{{ contact.pk }}" data-contact-name="{{ contact.name }}" title="Eliminar"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-center text-muted">No hay contactos registrados.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Menú lateral a la derecha -->
+        <div class="col-lg-3 mb-4 order-lg-2 order-1" style="margin-top: 5.1rem;">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Filtros</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="mb-3">
+                        <div class="mb-3">
+                            <label class="form-label">Ministerio</label>
+                            <select name="ministry" class="form-select">
+                                <option value="">Todos</option>
+                                {% for min in ministries %}
+                                    <option value="{{ min }}" {% if min == selected_ministry %}selected{% endif %}>{{ min }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn w-100 d-block mx-auto" style="background-color:#1a237e; color:#fff; max-width: 200px;">Filtrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal de confirmación de borrado global -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteModalLabel"><i class="fa fa-trash me-2"></i>Eliminar contacto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro que deseas eliminar el contacto <strong id="contactName"></strong>?</p>
+      </div>
+      <div class="modal-footer">
+        <form method="post" id="deleteForm">
+          {% csrf_token %}
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// Script para pasar el id y nombre al modal
+var deleteModal = document.getElementById('deleteModal');
+deleteModal.addEventListener('show.bs.modal', function (event) {
+  var button = event.relatedTarget;
+  var contactId = button.getAttribute('data-contact-id');
+  var contactName = button.getAttribute('data-contact-name');
+  var modalName = deleteModal.querySelector('#contactName');
+  var form = deleteModal.querySelector('#deleteForm');
+  modalName.textContent = contactName;
+  form.action = '/directory/delete/' + contactId + '/';
+});
+</script>
+{% endblock %} 

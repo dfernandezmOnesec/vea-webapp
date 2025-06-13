@@ -1,0 +1,154 @@
+{% extends "core/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Documentos - VEA Connect{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="row g-4">
+        <!-- Contenido principal a la izquierda -->
+        <div class="col-lg-9 mb-4 order-lg-1 order-2">
+            <div class="my-4">
+                <h2 class="fw-bold d-flex align-items-center mb-4" style="color:#1a237e; text-align:left;">
+                    <i class="fa fa-file-alt me-2" style="color:#1a237e; font-size:1.5rem;"></i>
+                    Documentos
+                </h2>
+            </div>
+            <!-- Panel principal -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <form method="get" class="input-group mb-3" action="">
+                        <input type="text" name="q" class="form-control" placeholder="Buscar por nombre, fecha o categoría..." value="{{ q|default:'' }}">
+                        {% for cat in selected_categories %}
+                            <input type="hidden" name="category" value="{{ cat }}">
+                        {% endfor %}
+                        <button class="btn btn-outline-dark" type="submit">
+                            <i class="fas fa-search me-1"></i> Buscar
+                        </button>
+                    </form>
+                    <a href="{% url 'documents:create' %}" class="btn" style="background-color:#1a237e; color:#fff; margin-bottom: 1.5rem;" class="w-100 text-start shadow-sm py-3 d-flex align-items-center justify-content-between mb-4">
+                        <div><i class="fas fa-cloud-upload-alt me-2"></i>Sube aquí tus documentos</div>
+                    
+                    </a>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Documento</th>
+                                    <th>Fecha</th>
+                                    <th>Categoría</th>
+                                    <th>Descripción</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for doc in documents %}
+                                <tr>
+                                    <td>{{ doc.title }}</td>
+                                    <td>{{ doc.uploaded_at|date:"d/m/Y" }}</td>
+                                    <td>{{ doc.get_category_display }}</td>
+                                    <td>{{ doc.description }}</td>
+                                    <td class="text-center">
+                                        <a href="{{ doc.file.url }}" class="btn btn-sm" style="background-color:#1a237e; color:#fff;" target="_blank" title="Abrir"><i class="fas fa-external-link-alt"></i></a>
+                                        <a href="{% url 'documents:edit' doc.pk %}" class="btn btn-sm btn-warning me-1" title="Editar"><i class="fas fa-edit"></i></a>
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-doc-id="{{ doc.pk }}" data-doc-title="{{ doc.title }}" title="Eliminar"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-center text-muted">No hay documentos.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Menú lateral a la derecha -->
+        <div class="col-lg-3 mb-4 order-lg-2 order-1" style="margin-top: 5.1rem;">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Filtros</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="mb-3">
+                        <div class="mb-3">
+                            <label class="form-label">Categoría</label>
+                            <select name="category" class="form-select">
+                                <option value="">Todas</option>
+                                <option value="ministerios" {% if 'ministerios' in selected_categories %}selected{% endif %}>Ministerios</option>
+                                <option value="formacion" {% if 'formacion' in selected_categories %}selected{% endif %}>Formación</option>
+                                <option value="eventos" {% if 'eventos' in selected_categories %}selected{% endif %}>Eventos</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn w-100 d-block mx-auto" style="background-color:#1a237e; color:#fff; max-width: 200px;">Filtrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de borrado -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteModalLabel"><i class="fa fa-trash me-2"></i>Eliminar documento</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro que deseas eliminar el documento <strong id="docTitle"></strong>?</p>
+      </div>
+      <div class="modal-footer">
+        <form method="post" id="deleteForm">
+          {% csrf_token %}
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// Script para pasar el id y título al modal
+var deleteModal = document.getElementById('deleteModal');
+deleteModal.addEventListener('show.bs.modal', function (event) {
+  var button = event.relatedTarget;
+  var docId = button.getAttribute('data-doc-id');
+  var docTitle = button.getAttribute('data-doc-title');
+  var modalTitle = deleteModal.querySelector('#docTitle');
+  var form = deleteModal.querySelector('#deleteForm');
+  modalTitle.textContent = docTitle;
+  form.action = '/documents/delete/' + docId + '/';
+});
+</script>
+
+{% if messages %}
+  {% for message in messages %}
+    {% if message.tags == 'success' %}
+      <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+              <h5 class="modal-title" id="successModalLabel"><i class="fa fa-check-circle me-2"></i>¡Éxito!</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              <p>{{ message }}</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+        window.addEventListener('DOMContentLoaded', function() {
+          successModal.show();
+        });
+      </script>
+    {% endif %}
+  {% endfor %}
+{% endif %}
+{% endblock %}
