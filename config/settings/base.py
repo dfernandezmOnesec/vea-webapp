@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     # Apps del proyecto
     'apps.core',
     'apps.dashboard',
-    'apps.documents',
+    'apps.documents.apps.DocumentsConfig',
     'apps.events',
     'apps.directory',
     'apps.donations',
