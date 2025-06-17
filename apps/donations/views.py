@@ -13,28 +13,18 @@ def donation_list(request):
     Incluye búsqueda por título, tipo y entidad.
     """
     query = request.GET.get('q', '').strip()
-    donation_type = request.GET.get('donation_type', '').strip()
-    
-    donations = Donation.objects.all()
-    
+    donations = Donation.objects.all().order_by('-created_at')
     if query:
         donations = donations.filter(
             Q(title__icontains=query) |
-            Q(donation_type__icontains=query) |
+            Q(donation_type__name__icontains=query) |
             Q(entity__icontains=query) |
             Q(description__icontains=query)
         )
-    
-    if donation_type:
-        donations = donations.filter(donation_type=donation_type)
-    
     context = {
         'donations': donations,
         'query': query,
-        'selected_type': donation_type,
-        'donation_types': Donation.TYPE_CHOICES,
     }
-    
     return render(request, 'donations/donations.html', context)
 
 @login_required
@@ -46,11 +36,19 @@ def donation_create(request):
     if request.method == 'POST':
         form = DonationForm(request.POST)
         if form.is_valid():
-            donation = form.save(commit=False)
-            donation.created_by = request.user
-            donation.save()
-            messages.success(request, 'Donación creada exitosamente.')
-            return redirect('donations:list')
+            try:
+                form.save(user=request.user)
+                messages.success(request, 'Donación creada exitosamente.')
+                return redirect('donations:list')
+            except Exception as e:
+                messages.error(request, 'Ocurrió un error al guardar la donación. Por favor, revisa los campos obligatorios e inténtalo de nuevo.')
+                print(f"Error al crear donación: {str(e)}")
+                print(f"Datos del formulario: {form.cleaned_data}")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+                    print(f"Error en campo {field}: {error}")
     else:
         form = DonationForm()
     

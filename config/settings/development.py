@@ -22,7 +22,7 @@ DATABASES = {
         'NAME': 'vea_connect',
         'USER': 'twsugyiaxf',
         'PASSWORD': 'E72$rhqEdm6b9oaI',
-        'HOST': 'micrositio-vea-connect-server.postgres.database.azure.com',
+        'HOST': 'micrositio-vea-connect-server.rs-b76d4c4689ff.postgres.database.azure.com',
         'PORT': '5432',
         'OPTIONS': {
             'sslmode': 'require'

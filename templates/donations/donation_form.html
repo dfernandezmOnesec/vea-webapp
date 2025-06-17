@@ -80,16 +80,6 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="{{ form.number.id_for_label }}" class="form-label">Número de Cuenta</label>
-                            {{ form.number|add_class:"form-control" }}
-                            {% if form.number.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ form.number.errors }}
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="mb-3">
                             <label for="{{ form.clabe.id_for_label }}" class="form-label">CLABE</label>
                             {{ form.clabe|add_class:"form-control" }}
                             {% if form.clabe.errors %}

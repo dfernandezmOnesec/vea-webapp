@@ -30,15 +30,11 @@ class Donation(models.Model):
 
     title = models.CharField(
         max_length=200,
-        blank=True,
-        null=True,
         verbose_name=_('Título')
     )
     donation_type = models.ForeignKey(
         'DonationType',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        on_delete=models.PROTECT,
         verbose_name=_('Tipo de donación')
     )
     amount = models.DecimalField(
@@ -93,8 +89,6 @@ class Donation(models.Model):
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        null=True,
-        blank=True,
         verbose_name=_('Fecha de creación')
     )
 

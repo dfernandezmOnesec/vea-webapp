@@ -10,7 +10,8 @@ def main():
 
     # Carga .env solo en desarrollo local
     if 'WEBSITE_HOSTNAME' not in os.environ:
-        print("🔧 Cargando variables desde .env (modo local)")
+        # print("🔧 Cargando variables desde .env (modo local)")
+        print("Cargando variables desde .env (modo local)")
         load_dotenv('./.env')
 
     # Selecciona settings en función del entorno
