@@ -9,6 +9,7 @@ import mimetypes
 import datetime
 from django.http import HttpResponseRedirect
 from django.db import models
+from utilities.azureblobstorage import upload_to_blob, trigger_document_processing
 
 @login_required
 def upload_document(request):
@@ -24,9 +25,25 @@ def upload_document(request):
             file_extension = file_name.split('.')[-1].lower()
             document.file_type = file_extension
             document.is_processed = False
-            document.save()
-            messages.success(request, f"El documento '{document.title}' se subió correctamente.")
-            return redirect('documents:document_list')
+            
+            # Subir el archivo a Azure Blob Storage
+            file = request.FILES['file']
+            blob_name = f"documents/{file.name}" # Define una ruta/nombre para el blob
+            
+            try:
+                upload_to_blob(file, blob_name)
+                document.file.name = blob_name # Guarda la referencia en el modelo
+                document.save()
+
+                # Disparar la Azure Function para el procesamiento
+                trigger_document_processing(blob_name)
+                
+                messages.success(request, f"El documento '{document.title}' se subió correctamente.")
+                return redirect('documents:document_list')
+            except Exception as e:
+                # Manejar el error de subida o de trigger
+                # Puedes agregar un mensaje de error para el usuario
+                form.add_error(None, f"Error al procesar el documento: {e}")
     else:
         form = DocumentForm()
     return render(request, 'documents/create.html', {'form': form})

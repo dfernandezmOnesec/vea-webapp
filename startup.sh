@@ -7,4 +7,4 @@ python manage.py migrate
 python manage.py collectstatic --noinput
 
 # Iniciar Gunicorn
-gunicorn azureproject.wsgi --bind 0.0.0.0:8000 --workers 4
+gunicorn config.wsgi --bind 0.0.0.0:8000 --workers 4

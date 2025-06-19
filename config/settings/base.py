@@ -10,7 +10,14 @@ if os.getenv("DJANGO_ENV") == "production":
 else:
     SECRET_KEY = "dev-secret-key-unsafe"
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+# Azure Function App Settings
+FUNCTION_APP_URL = os.environ.get('FUNCTION_APP_URL') # ej: https://func-vea-connect-dev.azurewebsites.net/api/FunctionName
+FUNCTION_APP_KEY = os.environ.get('FUNCTION_APP_KEY') # La clave 'default' de tus Host Keys
 
 # -------------------------
 # Base de Datos (PostgreSQL)

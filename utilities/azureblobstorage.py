@@ -5,6 +5,7 @@ from azure.storage.blob import (
     ContentSettings
 )
 from django.conf import settings
+import requests
 
 # Conexión base
 def get_blob_service_client():
@@ -151,3 +152,43 @@ def upload_to_blob(file_or_buffer, blob_name):
     except Exception as e:
         print(f"Error en upload_to_blob: {str(e)}")
         raise
+
+def trigger_document_processing(blob_name):
+    """
+    Llama a la Azure Function con un HTTP Trigger para iniciar el procesamiento.
+    """
+    try:
+        function_url = settings.FUNCTION_APP_URL
+        function_key = settings.FUNCTION_APP_KEY
+
+        if not function_url or not function_key:
+            print("Advertencia: FUNCTION_APP_URL o FUNCTION_APP_KEY no están configuradas. Omitiendo trigger.")
+            return None
+
+        headers = {
+            'Content-Type': 'application/json',
+            'x-functions-key': function_key
+        }
+        
+        # El cuerpo del payload puede ajustarse a lo que tu Azure Function espere.
+        # Por ejemplo, el nombre del blob que debe procesar.
+        payload = {
+            'blob_name': blob_name
+        }
+
+        print(f"Llamando a Azure Function para procesar: {blob_name}")
+        
+        response = requests.post(function_url, headers=headers, json=payload, timeout=30)
+        
+        response.raise_for_status()  # Lanza una excepción para respuestas 4xx/5xx
+
+        print(f"Llamada a Azure Function exitosa. Status: {response.status_code}")
+        return response.json()
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error al llamar a la Azure Function: {str(e)}")
+        # Aquí podrías reintentar o registrar el fallo para un procesamiento posterior
+        return None
+    except Exception as e:
+        print(f"Error inesperado al disparar la función: {str(e)}")
+        return None
