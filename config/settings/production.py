@@ -80,7 +80,14 @@ LOGGING = {
 
 # No usar dotenv en producción
 
-ALLOWED_HOSTS = [os.environ.get('WEBSITE_HOSTNAME', '127.0.0.1'), 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    os.environ.get('WEBSITE_HOSTNAME', '127.0.0.1'), 
+    'localhost', 
+    '127.0.0.1',
+    '169.254.130.4',  # IP interna de Azure
+    '169.254.0.0/16',  # Rango de IPs internas de Azure
+    '*',  # Temporalmente permitir todos los hosts para debugging
+]
 
 CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['WEBSITE_HOSTNAME']]
 
