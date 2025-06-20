@@ -41,11 +41,15 @@ jobs:
     
     - name: Set up environment variables
       run: |
+        echo "CI_ENVIRONMENT=true" >> $GITHUB_ENV
         echo "DJANGO_SETTINGS_MODULE=config.settings.development" >> $GITHUB_ENV
         echo "SECRET_KEY=test-secret-key-for-ci" >> $GITHUB_ENV
         echo "DEBUG=True" >> $GITHUB_ENV
-        echo "DATABASE_URL=sqlite:///test.db" >> $GITHUB_ENV
-        echo "CI_ENVIRONMENT=true" >> $GITHUB_ENV
+        echo "DBNAME=postgres" >> $GITHUB_ENV
+        echo "DBUSER=postgres" >> $GITHUB_ENV
+        echo "DBPASS=postgres" >> $GITHUB_ENV
+        echo "DBHOST=localhost" >> $GITHUB_ENV
+        echo "DBPORT=5432" >> $GITHUB_ENV
     
     - name: Run database migrations
       run: |

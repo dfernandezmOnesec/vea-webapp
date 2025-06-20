@@ -16,87 +16,146 @@ description: This is a Python web app using the Django framework and the Azure D
 ---
 <!-- YAML front-matter schema: https://review.learn.microsoft.com/en-us/help/contribute/samples/process/onboarding?branch=main#supported-metadata-fields-for-readmemd -->
 
-# Deploy a Python (Django) web app with PostgreSQL in Azure
+# VEA WebApp
 
-This is a Python web app using the Django framework and the Azure Database for PostgreSQL relational database service. The Django app is hosted in a fully managed Azure App Service. This app is designed to be be run locally and then deployed to Azure. You can either deploy this project by following the tutorial [*Deploy a Python (Django or Flask) web app with PostgreSQL in Azure*](https://docs.microsoft.com/azure/app-service/tutorial-python-postgresql-app) or by using the [Azure Developer CLI (azd)](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview) according to the instructions below.
+Aplicación web Django para la gestión de eventos, donaciones, documentos y contactos de la iglesia VEA.
 
-Additionally, the sample application demonstrates Azure Redis Cache access by caching the restaurant details page for 60 seconds. You can add the Azure Redis Cache integration in the [secure-by-default web app + database creation wizard](https://portal.azure.com/?feature.customportal=false#create/Microsoft.AppServiceWebAppDatabaseV3), and it's also included in the [AZD template](https://github.com/Azure-Samples/python-app-service-postgresql-infra).
+## Configuración de Entornos
 
-## Requirements
+### 🏠 Desarrollo Local
 
-The [requirements.txt](./requirements.txt) has the following packages, all used by a typical data-driven Django application:
+1. **Clona el repositorio:**
+   ```bash
+   git clone https://github.com/dfernandezmOnesec/vea-webapp.git
+   cd vea-webapp
+   ```
 
-| Package | Description |
-| ------- | ----------- |
-| [Django](https://pypi.org/project/Django/) | Web application framework. |
-| [pyscopg2-binary](https://pypi.org/project/psycopg-binary/) | PostgreSQL database adapter for Python. |
-| [python-dotenv](https://pypi.org/project/python-dotenv/) | Read key-value pairs from .env file and set them as environment variables. In this sample app, those variables describe how to connect to the database locally. <br><br> This package is used in the [manage.py](./manage.py) file to load environment variables. |
-| [whitenoise](https://pypi.org/project/whitenoise/) | Static file serving for WSGI applications, used in the deployed app. <br><br> This package is used in the [azureproject/production.py](./azureproject/production.py) file, which configures production settings. |
-| [django-redis](https://pypi.org/project/django-redis/) | Redis cache backend for Django. |
+2. **Crea un entorno virtual:**
+   ```bash
+   python -m venv venv
+   # En Windows:
+   venv\Scripts\activate
+   # En macOS/Linux:
+   source venv/bin/activate
+   ```
 
-## Run the sample
+3. **Instala las dependencias:**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-This project has a [dev container configuration](.devcontainer/), which makes it easier to develop apps locally, deploy them to Azure, and monitor them. The easiest way to run this sample application is inside a GitHub codespace. Follow these steps:
+4. **Configura las variables de entorno:**
+   Crea un archivo `.env` en la raíz del proyecto:
+   ```env
+   # Azure Blob Storage (requerido para desarrollo)
+   BLOB_ACCOUNT_NAME=tu_cuenta_blob
+   BLOB_ACCOUNT_KEY=tu_clave_blob
+   BLOB_CONTAINER_NAME=tu_contenedor
+   
+   # Django (opcional, usa valores por defecto en desarrollo)
+   SECRET_KEY=tu_clave_secreta
+   DEBUG=True
+   ```
 
-1. Fork this repository to your account. For instructions, see [Fork a repo](https://docs.github.com/get-started/quickstart/fork-a-repo).
+5. **Aplica las migraciones:**
+   ```bash
+   python manage.py migrate
+   ```
 
-1. From the repository root of your fork, select **Code** > **Codespaces** > **+**.
+6. **Crea un superusuario:**
+   ```bash
+   python manage.py createsuperuser
+   ```
 
-1. In the codespace terminal, run the following commands:
+7. **Ejecuta el servidor:**
+   ```bash
+   python manage.py runserver
+   ```
 
-    ```shell
-    # Run database migrations
-    python3 manage.py migrate
-    # Start the development server
-    python3 manage.py runserver
-    ```
+**Nota:** En desarrollo local, la aplicación usa automáticamente SQLite para la base de datos.
 
-1. When you see the message `Your application running on port 8000 is available.`, click **Open in Browser**.
+### 🧪 CI/CD (GitHub Actions)
 
-### Quick deploy
+El pipeline de CI/CD está configurado para:
+- Usar PostgreSQL local en contenedores
+- Ejecutar pruebas unitarias, funcionales e integración
+- Verificar la calidad del código con flake8
+- Generar reportes de cobertura
 
-This project is designed to work well with the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview), which makes it easier to develop apps locally, deploy them to Azure, and monitor them. 
+Las variables de entorno se configuran automáticamente en el workflow.
 
-🎥 Watch a deployment of the code in this [screencast](https://www.youtube.com/watch?v=JDlZ4TgPKYc).
-> Learn more about developing and deploying Django apps to Azure from Microsoft's comprehensive beginner series:
-> [Django for Beginners](https://www.youtube.com/playlist?list=PLlrxD0HtieHjHCQ0JB_RrhbQp_9ccJztr).
+### 🚀 Producción (Azure)
 
-Steps for deployment:
+Para desplegar en Azure:
 
-1. Sign up for a [free Azure account](https://azure.microsoft.com/free/)
-2. Install the [Azure Dev CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd). (If you opened this repository in a Dev Container, it's already installed for you.)
-3. Initialize a new `azd` environment:
+1. **Configura Azure Key Vault** con los siguientes secretos:
+   - `DB_NAME`: Nombre de la base de datos PostgreSQL
+   - `DB_USER`: Usuario de la base de datos
+   - `DB_PASSWORD`: Contraseña de la base de datos
+   - `DB_HOST`: Host de la base de datos
+   - `DB_PORT`: Puerto de la base de datos (5432)
+   - `SECRET_KEY`: Clave secreta de Django
+   - `BLOB_ACCOUNT_NAME`: Nombre de la cuenta de Azure Blob Storage
+   - `BLOB_ACCOUNT_KEY`: Clave de la cuenta de Azure Blob Storage
+   - `BLOB_CONTAINER_NAME`: Nombre del contenedor de Azure Blob Storage
 
-    ```shell
-    azd init
-    ```
+2. **Configura las variables de entorno en Azure App Service:**
+   - `DJANGO_ENV=production`
+   - `DJANGO_SETTINGS_MODULE=config.settings.production`
 
-    It will prompt you to provide a name (like "django-app"), which will later be used in the name of the deployed resources.
+3. **Despliega usando el workflow de GitHub Actions** o Azure CLI.
 
-4. Provision and deploy all the resources:
+## Estructura del Proyecto
 
-    ```shell
-    azd up
-    ```
+```
+vea-webapp/
+├── apps/                    # Aplicaciones Django
+│   ├── core/               # Usuarios y autenticación
+│   ├── dashboard/          # Panel principal
+│   ├── directory/          # Gestión de contactos
+│   ├── documents/          # Gestión de documentos
+│   ├── donations/          # Gestión de donaciones
+│   ├── events/             # Gestión de eventos
+│   └── user_settings/      # Configuración de usuario
+├── config/                 # Configuración del proyecto
+│   └── settings/           # Configuraciones por entorno
+├── static/                 # Archivos estáticos
+├── templates/              # Plantillas HTML
+├── tests/                  # Pruebas automatizadas
+└── requirements.txt        # Dependencias de Python
+```
 
-    It will prompt you to login, pick a subscription, and provide a location (like "eastus"). Then it will provision the resources in your account and deploy the latest code. If you get an error with deployment, changing the location (like to "centralus") can help, as there may be availability constraints for some of the resources.
+## Características
 
-5. When `azd` has finished deploying, you'll see an endpoint URI in the command output. Visit that URI, and you should see the front page of the restaurant review app! 🎉 If you see an error, open the Azure Portal from the URL in the command output, navigate to the App Service, select Logstream, and check the logs for any errors.
+- ✅ **Autenticación personalizada** con email
+- ✅ **Gestión de eventos** con fechas y ubicaciones
+- ✅ **Sistema de donaciones** con múltiples tipos y métodos
+- ✅ **Directorio de contactos** organizado por ministerios
+- ✅ **Gestión de documentos** con categorías
+- ✅ **Panel de administración** personalizado
+- ✅ **Almacenamiento en Azure Blob Storage**
+- ✅ **Base de datos PostgreSQL** en producción
+- ✅ **Pruebas automatizadas** con cobertura
+- ✅ **CI/CD** con GitHub Actions
 
-    ![Screenshot of Django restaurants website](screenshot_website.png)
+## Tecnologías
 
-6. If you'd like to access `/admin`, you'll need a Django superuser. Navigate to the Azure Portal for the App Service, select SSH, and run this command:
+- **Backend:** Django 5.2
+- **Base de datos:** PostgreSQL (producción), SQLite (desarrollo)
+- **Frontend:** Bootstrap 5, FontAwesome
+- **Almacenamiento:** Azure Blob Storage
+- **Despliegue:** Azure App Service
+- **CI/CD:** GitHub Actions
+- **Pruebas:** pytest, coverage
 
-    ```shell
-    python3 manage.py createsuperuser
-    ```
+## Contribución
 
-7. When you've made any changes to the app code, you can just run:
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
 
-    ```shell
-    azd deploy
-    ```
+## Licencia
 
-## Getting help
-
-If you're working with this project and running into issues, please post in [Issues](/issues).
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE.md` para más detalles.

@@ -3,7 +3,7 @@
 from django.db import models
 
 class Event(models.Model):
-    title = models.CharField(max_length=200, verbose_name="Título del evento", blank=True, null=True)
+    title = models.CharField(max_length=200, verbose_name="Título del evento")
     description = models.TextField(blank=True, null=True, verbose_name="Descripción")
     date = models.DateField(verbose_name="Fecha", blank=True, null=True)
     time = models.TimeField(verbose_name="Hora", blank=True, null=True)

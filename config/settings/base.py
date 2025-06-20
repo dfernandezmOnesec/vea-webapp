@@ -21,10 +21,23 @@ FUNCTION_APP_URL = os.environ.get('FUNCTION_APP_URL') # ej: https://func-vea-con
 FUNCTION_APP_KEY = os.environ.get('FUNCTION_APP_KEY') # La clave 'default' de tus Host Keys
 
 # -------------------------
-# Base de Datos (PostgreSQL)
+# Base de Datos
 # -------------------------
-# Si estamos en modo de prueba o CI/CD, usa SQLite para evitar conflictos y acelerar las pruebas.
-if 'test' in sys.argv or os.getenv('CI_ENVIRONMENT') == 'true':
+# Configuración de base de datos según el entorno
+if os.getenv('CI_ENVIRONMENT') == 'true':
+    # Entorno de CI/CD - PostgreSQL local
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('DBNAME', 'postgres'),
+            'USER': os.environ.get('DBUSER', 'postgres'),
+            'PASSWORD': os.environ.get('DBPASS', 'postgres'),
+            'HOST': os.environ.get('DBHOST', 'localhost'),
+            'PORT': os.environ.get('DBPORT', '5432'),
+        }
+    }
+elif 'test' in sys.argv:
+    # Modo de prueba - SQLite
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -32,7 +45,7 @@ if 'test' in sys.argv or os.getenv('CI_ENVIRONMENT') == 'true':
         }
     }
 else:
-    # Para desarrollo y producción, usa dj_database_url
+    # Desarrollo local y producción - usar dj_database_url
     database_url = os.getenv('DATABASE_URL')
     if database_url and database_url.startswith('sqlite'):
         # Si es SQLite, no usar parámetros de PostgreSQL

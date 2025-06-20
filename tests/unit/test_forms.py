@@ -20,7 +20,8 @@ class ContactFormTest(TestCase):
     def test_contact_form_valid(self):
         """Prueba que el formulario sea válido con datos correctos"""
         form_data = {
-            'name': 'Juan Pérez',
+            'first_name': 'Juan',
+            'last_name': 'Pérez',
             'role': 'Pastor',
             'ministry': 'Ministerio de Jóvenes',
             'contact': 'juan@iglesia.com'
@@ -31,18 +32,20 @@ class ContactFormTest(TestCase):
     def test_contact_form_invalid_missing_required(self):
         """Prueba que el formulario sea inválido sin campos requeridos"""
         form_data = {
-            'name': 'Juan Pérez',
-            # Falta ministry y contact
+            'first_name': 'Juan',
+            # Falta last_name, ministry y contact
         }
         form = ContactForm(data=form_data)
         self.assertFalse(form.is_valid())
+        self.assertIn('last_name', form.errors)
         self.assertIn('ministry', form.errors)
         self.assertIn('contact', form.errors)
 
     def test_contact_form_save(self):
         """Prueba que el formulario guarde correctamente"""
         form_data = {
-            'name': 'Juan Pérez',
+            'first_name': 'Juan',
+            'last_name': 'Pérez',
             'role': 'Pastor',
             'ministry': 'Ministerio de Jóvenes',
             'contact': 'juan@iglesia.com'
@@ -50,7 +53,8 @@ class ContactFormTest(TestCase):
         form = ContactForm(data=form_data)
         self.assertTrue(form.is_valid())
         contact = form.save()
-        self.assertEqual(contact.name, 'Juan Pérez')
+        self.assertEqual(contact.first_name, 'Juan')
+        self.assertEqual(contact.last_name, 'Pérez')
         self.assertEqual(contact.role, 'Pastor')
         self.assertEqual(contact.ministry, 'Ministerio de Jóvenes')
         self.assertEqual(contact.contact, 'juan@iglesia.com')

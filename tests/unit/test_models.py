@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 from decimal import Decimal
+from datetime import timedelta
 
 from apps.core.models import CustomUser
 from apps.directory.models import Contact
@@ -68,12 +69,14 @@ class ContactModelTest(TestCase):
     def test_create_contact(self):
         """Prueba la creación de un contacto"""
         contact = Contact.objects.create(
-            name="Juan Pérez",
+            first_name="Juan",
+            last_name="Pérez",
             role="Pastor",
             ministry="Ministerio de Jóvenes",
             contact="juan@iglesia.com"
         )
-        self.assertEqual(contact.name, "Juan Pérez")
+        self.assertEqual(contact.first_name, "Juan")
+        self.assertEqual(contact.last_name, "Pérez")
         self.assertEqual(contact.role, "Pastor")
         self.assertEqual(contact.ministry, "Ministerio de Jóvenes")
         self.assertEqual(contact.contact, "juan@iglesia.com")
@@ -82,26 +85,29 @@ class ContactModelTest(TestCase):
     def test_contact_string_representation(self):
         """Prueba la representación en string del contacto"""
         contact = Contact.objects.create(
-            name="Juan Pérez",
+            first_name="Juan",
+            last_name="Pérez",
             ministry="Ministerio de Jóvenes",
             contact="juan@iglesia.com"
         )
         self.assertEqual(str(contact), "Juan Pérez")
 
     def test_contact_ordering(self):
-        """Prueba el ordenamiento de contactos por nombre"""
+        """Prueba el ordenamiento de contactos por apellido y nombre"""
         contact2 = Contact.objects.create(
-            name="Ana García",
+            first_name="Ana",
+            last_name="García",
             ministry="Ministerio de Mujeres",
             contact="ana@iglesia.com"
         )
         contact1 = Contact.objects.create(
-            name="Juan Pérez",
+            first_name="Juan",
+            last_name="Pérez",
             ministry="Ministerio de Jóvenes",
             contact="juan@iglesia.com"
         )
         contacts = Contact.objects.all()
-        self.assertEqual(contacts[0], contact1)  # Juan Pérez
+        self.assertEqual(contacts[0], contact1)  # Juan Pérez (Pérez < García)
         self.assertEqual(contacts[1], contact2)  # Ana García
 
 
@@ -140,15 +146,21 @@ class DocumentModelTest(TestCase):
 
     def test_document_ordering(self):
         """Prueba el ordenamiento de documentos por fecha"""
+        # Crear documentos con fechas diferentes
+        old_date = timezone.now() - timedelta(days=1)
+        recent_date = timezone.now()
+        
         document1 = Document.objects.create(
             title="Documento antiguo",
             category="eventos_generales",
-            user=self.user
+            user=self.user,
+            date=old_date
         )
         document2 = Document.objects.create(
             title="Documento reciente",
             category="ministerios",
-            user=self.user
+            user=self.user,
+            date=recent_date
         )
         documents = Document.objects.all()
         self.assertEqual(documents[0], document2)  # Más reciente primero
