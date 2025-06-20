@@ -102,10 +102,15 @@ class Donation(models.Model):
         return f"{self.title or self.get_donation_type_display()} - {self.created_at.strftime('%d/%m/%Y')}"
     
     def clean(self):
-        # Solo validar monto negativo si el tipo es Monetaria
-        if self.donation_type and self.donation_type.name.lower() == "monetaria":
-            if self.amount is not None and self.amount < 0:
-                raise ValidationError("El valor de la donación monetaria no puede ser negativo.")
+        # Only validate if donation_type is set
+        if hasattr(self, 'donation_type_id') and self.donation_type_id:
+            try:
+                if self.donation_type and self.donation_type.name.lower() == "monetaria":
+                    if self.amount is not None and self.amount < 0:
+                        raise ValidationError("El valor de la donación monetaria no puede ser negativo.")
+            except self.donation_type.RelatedObjectDoesNotExist:
+                # If donation_type doesn't exist, skip validation
+                pass
     
     def save(self, *args, **kwargs):
         """Validar antes de guardar"""
