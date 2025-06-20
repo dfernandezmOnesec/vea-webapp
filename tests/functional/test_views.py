@@ -52,7 +52,8 @@ class DirectoryViewsTest(TestCase):
             password='testpass123'
         )
         self.contact = Contact.objects.create(
-            name="Juan Pérez",
+            first_name="Juan",
+            last_name="Pérez",
             role="Pastor",
             ministry="Ministerio de Jóvenes",
             contact="juan@iglesia.com"
@@ -74,14 +75,15 @@ class DirectoryViewsTest(TestCase):
     def test_contact_create_view_post(self):
         """Prueba la vista de creación de contacto (POST)"""
         data = {
-            'name': 'Ana García',
+            'first_name': 'Ana',
+            'last_name': 'García',
             'role': 'Líder',
             'ministry': 'Ministerio de Mujeres',
             'contact': 'ana@iglesia.com'
         }
         response = self.client.post(reverse('directory:create'), data)
         self.assertEqual(response.status_code, 302)  # Redirect
-        self.assertTrue(Contact.objects.filter(name='Ana García').exists())
+        self.assertTrue(Contact.objects.filter(first_name='Ana', last_name='García').exists())
 
     def test_contact_edit_view_get(self):
         """Prueba la vista de edición de contacto (GET)"""
@@ -93,7 +95,8 @@ class DirectoryViewsTest(TestCase):
     def test_contact_edit_view_post(self):
         """Prueba la vista de edición de contacto (POST)"""
         data = {
-            'name': 'Juan Pérez Actualizado',
+            'first_name': 'Juan',
+            'last_name': 'Pérez Actualizado',
             'role': 'Pastor Principal',
             'ministry': 'Ministerio de Jóvenes',
             'contact': 'juan@iglesia.com'
@@ -101,7 +104,8 @@ class DirectoryViewsTest(TestCase):
         response = self.client.post(reverse('directory:edit', args=[self.contact.pk]), data)
         self.assertEqual(response.status_code, 302)  # Redirect
         self.contact.refresh_from_db()
-        self.assertEqual(self.contact.name, 'Juan Pérez Actualizado')
+        self.assertEqual(self.contact.first_name, 'Juan')
+        self.assertEqual(self.contact.last_name, 'Pérez Actualizado')
 
     def test_contact_delete_view_get(self):
         """Prueba la vista de eliminación de contacto (GET)"""

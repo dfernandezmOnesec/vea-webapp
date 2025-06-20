@@ -47,7 +47,7 @@ class UserWorkflowTest(TestCase):
         self.assertEqual(response.status_code, 302)  # Redirect después de crear
 
         # 3. Verificar que el contacto se creó
-        contact = Contact.objects.get(name='María González')
+        contact = Contact.objects.get(first_name='María', last_name='González')
         self.assertEqual(contact.role, 'Líder de Ministerio')
         self.assertEqual(contact.ministry, 'Ministerio de Mujeres')
 
@@ -259,7 +259,7 @@ class UserWorkflowTest(TestCase):
         )
 
         # 2. Verificar que todos los datos están disponibles
-        self.assertTrue(Contact.objects.filter(name="Pastor Juan").exists())
+        self.assertTrue(Contact.objects.filter(first_name="Pastor", last_name="Juan").exists())
         self.assertTrue(Event.objects.filter(title="Conferencia General").exists())
         self.assertTrue(Document.objects.filter(title="Programa de Conferencia").exists())
         self.assertTrue(Donation.objects.filter(title="Donación para Conferencia").exists())
