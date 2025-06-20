@@ -11,14 +11,28 @@ X_FRAME_OPTIONS = 'DENY'
 
 # Configuración de base de datos para producción
 # Usar DATABASE_URL desde Azure Key Vault
+db_name = os.environ.get('AZURE_POSTGRESQL_NAME')
+db_user = os.environ.get('AZURE_POSTGRESQL_USERNAME')
+db_password = os.environ.get('AZURE_POSTGRESQL_PASSWORD')
+db_host = os.environ.get('AZURE_POSTGRESQL_HOST')
+db_port = os.environ.get('DB_PORT', '5432')
+
+# --- TEMPORARY DEBUGGING ---
+print(f"DEBUG DB_NAME: {db_name}")
+print(f"DEBUG DB_USER: {db_user}")
+print(f"DEBUG DB_HOST: {db_host}")
+print(f"DEBUG DB_PORT: {db_port}")
+print(f"DEBUG DB_PASSWORD IS SET: {'Yes' if db_password else 'No'}")
+# --- END TEMPORARY DEBUGGING ---
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('AZURE_POSTGRESQL_NAME'),
-        'USER': os.environ.get('AZURE_POSTGRESQL_USERNAME'),
-        'PASSWORD': os.environ.get('AZURE_POSTGRESQL_PASSWORD'),
-        'HOST': os.environ.get('AZURE_POSTGRESQL_HOST'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+        'NAME': db_name,
+        'USER': db_user,
+        'PASSWORD': db_password,
+        'HOST': db_host,
+        'PORT': db_port,
         'OPTIONS': {
             'sslmode': 'require',
         },
