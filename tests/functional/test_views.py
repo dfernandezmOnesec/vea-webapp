@@ -89,7 +89,7 @@ class DirectoryViewsTest(TestCase):
         """Prueba la vista de edición de contacto (GET)"""
         response = self.client.get(reverse('directory:edit', args=[self.contact.pk]))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'directory/create.html')
+        self.assertTemplateUsed(response, 'directory/edit.html')
         self.assertContains(response, "Juan Pérez")
 
     def test_contact_edit_view_post(self):
@@ -130,6 +130,8 @@ class DocumentsViewsTest(TestCase):
             username='testuser',
             password='testpass123'
         )
+        # Autenticar el usuario para todas las pruebas
+        self.client.login(username='testuser', password='testpass123')
         self.document = Document.objects.create(
             title="Documento de prueba",
             description="Descripción de prueba",
@@ -211,12 +213,14 @@ class EventsViewsTest(TestCase):
             username='testuser',
             password='testpass123'
         )
+        # Autenticar el usuario para todas las pruebas
+        self.client.login(username='testuser', password='testpass123')
         self.event = Event.objects.create(
             title="Evento de prueba",
-            description="Descripción del evento",
-            date="2024-12-25",
-            time="18:00:00",
-            location="Iglesia Principal"
+            description="Descripción del evento de prueba",
+            date="2024-01-15",
+            time="14:00",
+            location="Iglesia Central"
         )
 
     def test_event_list_view(self):
@@ -289,14 +293,21 @@ class DonationsViewsTest(TestCase):
             username='testuser',
             password='testpass123'
         )
-        self.donation_type = DonationType.objects.create(name="Monetaria")
+        # Autenticar el usuario para todas las pruebas
+        self.client.login(username='testuser', password='testpass123')
+        
+        # Crear tipo de donación
+        self.donation_type = DonationType.objects.create(
+            name="Ofrenda",
+            description="Ofrenda regular"
+        )
+        
         self.donation = Donation.objects.create(
             title="Donación de prueba",
-            donation_type=self.donation_type,
+            description="Descripción de la donación de prueba",
             amount=Decimal('100.00'),
-            description="Descripción de la donación",
-            method="deposito",
-            entity="Banco de México",
+            donation_type=self.donation_type,
+            entity="Iglesia Central",
             created_by=self.user
         )
 
@@ -311,7 +322,7 @@ class DonationsViewsTest(TestCase):
         """Prueba la vista de creación de donación (GET)"""
         response = self.client.get(reverse('donations:create'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'donations/create.html')
+        self.assertTemplateUsed(response, 'donations/donation_form.html')
 
     def test_donation_create_view_post(self):
         """Prueba la vista de creación de donación (POST)"""
@@ -331,7 +342,7 @@ class DonationsViewsTest(TestCase):
         """Prueba la vista de edición de donación (GET)"""
         response = self.client.get(reverse('donations:edit', args=[self.donation.pk]))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'donations/create.html')
+        self.assertTemplateUsed(response, 'donations/donation_form.html')
         self.assertContains(response, "Donación de prueba")
 
     def test_donation_edit_view_post(self):
