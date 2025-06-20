@@ -23,8 +23,8 @@ FUNCTION_APP_KEY = os.environ.get('FUNCTION_APP_KEY') # La clave 'default' de tu
 # -------------------------
 # Base de Datos (PostgreSQL)
 # -------------------------
-# Si estamos en modo de prueba, usa SQLite para evitar conflictos y acelerar las pruebas.
-if 'test' in sys.argv:
+# Si estamos en modo de prueba o CI/CD, usa SQLite para evitar conflictos y acelerar las pruebas.
+if 'test' in sys.argv or os.getenv('CI_ENVIRONMENT') == 'true':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -32,13 +32,25 @@ if 'test' in sys.argv:
         }
     }
 else:
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.getenv('DATABASE_URL'),
-            conn_max_age=600,
-            ssl_require=True
-        )
-    }
+    # Para desarrollo y producción, usa dj_database_url
+    database_url = os.getenv('DATABASE_URL')
+    if database_url and database_url.startswith('sqlite'):
+        # Si es SQLite, no usar parámetros de PostgreSQL
+        DATABASES = {
+            'default': dj_database_url.config(
+                default=database_url,
+                conn_max_age=600
+            )
+        }
+    else:
+        # Para PostgreSQL, incluir parámetros SSL
+        DATABASES = {
+            'default': dj_database_url.config(
+                default=database_url,
+                conn_max_age=600,
+                ssl_require=True
+            )
+        }
 
 # -------------------------
 # Aplicaciones instaladas
