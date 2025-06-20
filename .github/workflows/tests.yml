@@ -48,7 +48,7 @@ jobs:
     
     - name: Run database migrations
       run: |
-        python manage.py migrate --settings=config.settings.development
+        python manage.py migrate
     
     - name: Run unit tests
       run: |
