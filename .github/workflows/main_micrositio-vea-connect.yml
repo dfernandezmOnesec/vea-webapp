@@ -72,10 +72,39 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C86D14D0E5484B4EACABC27EBA5B831D }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8AB8E469F13C481C84C2887E7A0E4A6A }}
 
+      - name: Stop Azure Web App
+        uses: azure/cli@v2
+        with:
+          inlineScript: |
+            az webapp stop --name 'micrositio-vea-connect' --resource-group 'rg-vea-connect-dev'
+
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
           app-name: 'micrositio-vea-connect'
           slot-name: 'Production'
+          startup-command: 'gunicorn --workers 4 --threads 4 --timeout 600 config.wsgi'
+        timeout-minutes: 5
+        continue-on-error: true
+
+      - name: Retry deployment if failed
+        if: steps.deploy-to-webapp.outcome == 'failure'
+        run: |
+          echo "Deployment failed. Retrying..."
+          # You can add a small delay here if needed, e.g., sleep 30
+          
+      - name: 'Final Deploy Attempt'
+        if: steps.deploy-to-webapp.outcome == 'failure'
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'micrositio-vea-connect'
+          slot-name: 'Production'
+          startup-command: 'gunicorn --workers 4 --threads 4 --timeout 600 config.wsgi'
+
+      - name: Start Azure Web App
+        uses: azure/cli@v2
+        with:
+          inlineScript: |
+            az webapp start --name 'micrositio-vea-connect' --resource-group 'rg-vea-connect-dev'
           
