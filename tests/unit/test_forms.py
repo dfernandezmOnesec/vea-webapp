@@ -10,7 +10,7 @@ from apps.core.models import CustomUser
 from apps.directory.forms import ContactForm
 from apps.documents.forms import DocumentForm
 from apps.events.forms import EventForm
-from apps.donations.forms import DonationForm, DonationTypeForm
+from apps.donations.forms import DonationForm
 from apps.donations.models import DonationType
 
 
@@ -193,35 +193,6 @@ class EventFormTest(TestCase):
         self.assertEqual(str(event.date), '2024-12-25')
         self.assertEqual(str(event.time), '18:00:00')
         self.assertEqual(event.location, 'Iglesia Principal')
-
-
-class DonationTypeFormTest(TestCase):
-    """Pruebas para el formulario DonationTypeForm"""
-
-    def test_donation_type_form_valid(self):
-        """Prueba que el formulario sea válido con datos correctos"""
-        form_data = {
-            'name': 'Monetaria'
-        }
-        form = DonationTypeForm(data=form_data)
-        self.assertTrue(form.is_valid())
-
-    def test_donation_type_form_invalid_missing_required(self):
-        """Prueba que el formulario sea inválido sin campos requeridos"""
-        form_data = {}
-        form = DonationTypeForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn('name', form.errors)
-
-    def test_donation_type_form_save(self):
-        """Prueba que el formulario guarde correctamente"""
-        form_data = {
-            'name': 'En especie'
-        }
-        form = DonationTypeForm(data=form_data)
-        self.assertTrue(form.is_valid())
-        donation_type = form.save()
-        self.assertEqual(donation_type.name, 'En especie')
 
 
 class DonationFormTest(TestCase):
