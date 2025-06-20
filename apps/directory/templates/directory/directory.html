@@ -42,13 +42,13 @@
                             <tbody>
                                 {% for contact in contacts %}
                                 <tr>
-                                    <td>{{ contact.name }}</td>
+                                    <td>{{ contact.first_name }} {{ contact.last_name }}</td>
                                     <td>{{ contact.role }}</td>
                                     <td>{{ contact.ministry }}</td>
                                     <td>{{ contact.contact }}</td>
                                     <td class="text-center">
                                         <a href="{% url 'directory:edit' contact.pk %}" class="btn btn-sm btn-warning me-1" title="Editar"><i class="fas fa-edit"></i></a>
-                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-contact-id="{{ contact.pk }}" data-contact-name="{{ contact.name }}" title="Eliminar"><i class="fas fa-trash"></i></button>
+                                        <button class="btn btn-danger btn-sm delete-contact" data-contact-id="{{ contact.pk }}" data-contact-name="{{ contact.first_name }} {{ contact.last_name }}" title="Eliminar"><i class="fas fa-trash"></i></button>
                                     </td>
                                 </tr>
                                 {% empty %}

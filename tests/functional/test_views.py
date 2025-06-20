@@ -298,7 +298,7 @@ class DonationsViewsTest(TestCase):
 
     def test_donation_list_view(self):
         """Prueba la vista de lista de donaciones"""
-        response = self.client.get(reverse('donations:donations'))
+        response = self.client.get(reverse('donations:list'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'donations/donations.html')
         self.assertContains(response, "Donación de prueba")

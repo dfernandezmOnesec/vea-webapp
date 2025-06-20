@@ -35,7 +35,7 @@
                     <tbody>
                         {% for contact in contacts %}
                         <tr>
-                            <td>{{ contact.name }} {{ contact.lastname }}</td>
+                            <td>{{ contact.first_name }} {{ contact.last_name }}</td>
                             <td>{{ contact.email|default:"-" }}</td>
                             <td>{{ contact.phone|default:"-" }}</td>
                             <td>{{ contact.organization|default:"-" }}</td>

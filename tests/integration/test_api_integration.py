@@ -136,10 +136,11 @@ class APIIntegrationTest(TestCase):
         contacts = []
         for i, ministry in enumerate(ministries):
             contact = Contact.objects.create(
-                name=f'Contacto {i+1}',
-                role=f'Líder de {ministry}',
-                ministry=ministry,
-                contact=f'contacto{i+1}@iglesia.com'
+                first_name=f'Contacto {i+1}',
+                last_name='Test',
+                role=f'Rol {i+1}',
+                ministry=f'Ministerio {i+1}',
+                contact=f'contacto{i+1}@test.com'
             )
             contacts.append(contact)
         
@@ -148,10 +149,10 @@ class APIIntegrationTest(TestCase):
         
         # Verificar ordenamiento alfabético por nombre
         ordered_contacts = Contact.objects.all()
-        self.assertEqual(ordered_contacts[0].name, 'Contacto 1')
-        self.assertEqual(ordered_contacts[1].name, 'Contacto 2')
-        self.assertEqual(ordered_contacts[2].name, 'Contacto 3')
-        self.assertEqual(ordered_contacts[3].name, 'Contacto 4')
+        self.assertEqual(ordered_contacts[0].first_name, 'Contacto 1')
+        self.assertEqual(ordered_contacts[1].first_name, 'Contacto 2')
+        self.assertEqual(ordered_contacts[2].first_name, 'Contacto 3')
+        self.assertEqual(ordered_contacts[3].first_name, 'Contacto 4')
 
     def test_user_authentication_integration(self):
         """Prueba la integración de autenticación de usuarios"""
@@ -248,7 +249,8 @@ class APIIntegrationTest(TestCase):
         contacts = []
         for i in range(10):
             contact = Contact.objects.create(
-                name=f'Contacto de Rendimiento {i+1}',
+                first_name=f'Contacto de Rendimiento {i+1}',
+                last_name='Test',
                 role=f'Rol {i+1}',
                 ministry=f'Ministerio {i+1}',
                 contact=f'contacto{i+1}@rendimiento.com'
@@ -263,5 +265,5 @@ class APIIntegrationTest(TestCase):
         self.assertEqual(filtered_contacts.count(), 10)
         
         # Probar ordenamiento
-        ordered_contacts = Contact.objects.order_by('name')
+        ordered_contacts = Contact.objects.order_by('first_name')
         self.assertEqual(len(ordered_contacts), 10) 

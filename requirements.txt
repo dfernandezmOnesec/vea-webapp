@@ -4,6 +4,7 @@ python-dotenv==1.0.1
 django-storages[azure]==1.14.2
 dj-database-url
 psycopg2-binary
+whitenoise
 
 # Testing
 pytest==7.4.0

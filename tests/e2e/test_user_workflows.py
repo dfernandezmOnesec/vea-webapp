@@ -173,7 +173,7 @@ class UserWorkflowTest(TestCase):
     def test_complete_donation_workflow(self):
         """Prueba el flujo completo de gestión de donaciones"""
         # 1. Acceder a la lista de donaciones
-        response = self.client.get(reverse('donations:donations'))
+        response = self.client.get(reverse('donations:list'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'donations/donations.html')
 
@@ -274,7 +274,7 @@ class UserWorkflowTest(TestCase):
         response = self.client.get(reverse('documents:document_list'))
         self.assertContains(response, "Programa de Conferencia")
 
-        response = self.client.get(reverse('donations:donations'))
+        response = self.client.get(reverse('donations:list'))
         self.assertContains(response, "Donación para Conferencia")
 
     def test_error_handling_workflow(self):
