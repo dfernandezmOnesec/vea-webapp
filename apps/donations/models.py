@@ -3,14 +3,22 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
+from decimal import Decimal
+from django.db.models import ObjectDoesNotExist
 
-
+User = get_user_model()
 
 class DonationType(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name=_('Nombre del tipo de donación'))
+    description = models.TextField(blank=True)
+    
     def __str__(self):
         return self.name
-
+    
+    class Meta:
+        verbose_name = "Tipo de Donación"
+        verbose_name_plural = "Tipos de Donación"
 
 class Donation(models.Model):
     TYPE_CHOICES = [
@@ -35,7 +43,7 @@ class Donation(models.Model):
     )
     donation_type = models.ForeignKey(
         'DonationType',
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         verbose_name=_('Tipo de donación')
     )
     amount = models.DecimalField(
@@ -47,7 +55,6 @@ class Donation(models.Model):
     )
     description = models.TextField(
         blank=True,
-        null=True,
         verbose_name=_('Descripción')
     )
     method = models.CharField(
@@ -82,34 +89,35 @@ class Donation(models.Model):
         verbose_name=_('Ubicación')
     )
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        User,
+        on_delete=models.CASCADE,
         verbose_name=_('Creado por')
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name=_('Fecha de creación')
     )
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = _('Donación')
-        verbose_name_plural = _('Donaciones')
+        verbose_name = "Donación"
+        verbose_name_plural = "Donaciones"
         ordering = ['-created_at']
 
     def __str__(self):
         return f"{self.title or self.get_donation_type_display()} - {self.created_at.strftime('%d/%m/%Y')}"
     
     def clean(self):
-        # Only validate if donation_type is set
+        # Only validate if donation_type is set and exists
         if hasattr(self, 'donation_type_id') and self.donation_type_id:
             try:
-                if self.donation_type and self.donation_type.name.lower() == "monetaria":
+                # Get the donation_type safely
+                donation_type = self.donation_type
+                if donation_type and donation_type.name.lower() == "monetaria":
                     if self.amount is not None and self.amount < 0:
                         raise ValidationError("El valor de la donación monetaria no puede ser negativo.")
-            except self.donation_type.RelatedObjectDoesNotExist:
-                # If donation_type doesn't exist, skip validation
+            except (ObjectDoesNotExist, AttributeError):
+                # If donation_type doesn't exist or can't be accessed, skip validation
                 pass
     
     def save(self, *args, **kwargs):
