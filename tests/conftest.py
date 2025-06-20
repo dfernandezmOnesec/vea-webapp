@@ -57,7 +57,8 @@ def admin_client(client, admin_user):
 def sample_contact():
     """Contacto de prueba"""
     return Contact.objects.create(
-        name="Juan Pérez",
+        first_name="Juan",
+        last_name="Pérez",
         role="Pastor",
         ministry="Ministerio de Jóvenes",
         contact="juan@iglesia.com"

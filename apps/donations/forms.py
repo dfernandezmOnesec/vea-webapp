@@ -27,12 +27,11 @@ class DonationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Asegurarse de que donation_type sea requerido
         self.fields['donation_type'].required = True
-        # Establecer el queryset para donation_type
         self.fields['donation_type'].queryset = DonationType.objects.all()
-        
-        # Hacer que los campos bancarios sean opcionales por defecto
+        self.fields['amount'].required = False
+        self.fields['method'].required = False
+        self.fields['entity'].required = False
         self.fields['bank'].required = False
         self.fields['clabe'].required = False
         

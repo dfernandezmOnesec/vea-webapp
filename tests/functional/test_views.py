@@ -351,14 +351,23 @@ class DonationsViewsTest(TestCase):
         data = {
             'title': 'Nueva donación',
             'donation_type': self.donation_type.id,
-            'amount': '200.00',
-            'description': 'Descripción de la nueva donación',
-            'method': 'transferencia',
-            'entity': 'Banco Santander'
+            'description': 'Descripción de la nueva donación'
+            # No se envía amount, method, entity
         }
         response = self.client.post(reverse('donations:create'), data)
         self.assertEqual(response.status_code, 302)  # Redirect
         self.assertTrue(Donation.objects.filter(title='Nueva donación').exists())
+
+    def test_donation_create_view_post_sin_monto_ni_banco(self):
+        """Prueba la creación de donación sin monto, método, banco ni entidad"""
+        data = {
+            'title': 'Donación sin monto',
+            'donation_type': self.donation_type.id,
+            'description': 'Solo descripción'
+        }
+        response = self.client.post(reverse('donations:create'), data)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Donation.objects.filter(title='Donación sin monto').exists())
 
     def test_donation_edit_view_get(self):
         """Prueba la vista de edición de donación (GET)"""
