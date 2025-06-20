@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import dj_database_url
+import sys
 
 # BASE_DIR apunta a la raíz del proyecto (vea-connect-website/)
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -22,13 +23,22 @@ FUNCTION_APP_KEY = os.environ.get('FUNCTION_APP_KEY') # La clave 'default' de tu
 # -------------------------
 # Base de Datos (PostgreSQL)
 # -------------------------
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=True
-    )
-}
+# Si estamos en modo de prueba, usa SQLite para evitar conflictos y acelerar las pruebas.
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3_test',
+        }
+    }
+else:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.getenv('DATABASE_URL'),
+            conn_max_age=600,
+            ssl_require=True
+        )
+    }
 
 # -------------------------
 # Aplicaciones instaladas

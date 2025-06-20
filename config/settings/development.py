@@ -1,4 +1,5 @@
 import os
+import sys
 from dotenv import load_dotenv
 from .base import *
 import dj_database_url
@@ -26,9 +27,12 @@ if not all([BLOB_ACCOUNT_NAME, BLOB_ACCOUNT_KEY, BLOB_CONTAINER_NAME]):
 DEBUG = True
 
 # Base de datos PostgreSQL para desarrollo
-# Si DATABASE_URL está definida en el entorno (p. ej., en CI/CD), se usará esa.
+# Si estamos en modo de prueba o DATABASE_URL está definida en el entorno (p. ej., en CI/CD), se usará esa.
 # De lo contrario, se usa la base de datos de desarrollo de PostgreSQL.
-if 'DATABASE_URL' not in os.environ:
+if 'test' in sys.argv or 'DATABASE_URL' in os.environ:
+    # Usar la configuración de base que ya maneja SQLite para pruebas
+    pass
+else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
