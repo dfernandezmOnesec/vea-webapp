@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 
 
 
@@ -99,4 +100,15 @@ class Donation(models.Model):
 
     def __str__(self):
         return f"{self.title or self.get_donation_type_display()} - {self.created_at.strftime('%d/%m/%Y')}"
+    
+    def clean(self):
+        # Solo validar monto negativo si el tipo es Monetaria
+        if self.donation_type and self.donation_type.name.lower() == "monetaria":
+            if self.amount is not None and self.amount < 0:
+                raise ValidationError("El valor de la donación monetaria no puede ser negativo.")
+    
+    def save(self, *args, **kwargs):
+        """Validar antes de guardar"""
+        self.full_clean()
+        super().save(*args, **kwargs)
         

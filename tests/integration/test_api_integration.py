@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from decimal import Decimal
 import json
+from django.core.exceptions import ValidationError
 
 from apps.core.models import CustomUser
 from apps.directory.models import Contact
@@ -225,9 +226,8 @@ class APIIntegrationTest(TestCase):
     def test_error_handling_integration(self):
         """Prueba el manejo de errores en integración"""
         # Intentar crear datos inválidos que realmente lancen excepciones
-        with self.assertRaises(Exception):
-            # Intentar crear donación con amount negativo (si hay validación)
-            Donation.objects.create(
+        with self.assertRaises(ValidationError):
+            donation = Donation(
                 title="Donación inválida",
                 donation_type=self.donation_type,
                 amount=Decimal('-100.00'),  # Valor negativo
@@ -236,18 +236,20 @@ class APIIntegrationTest(TestCase):
                 entity="Banco de México",
                 created_by=self.user
             )
+            donation.save()
         
         # Verificar que no se creó la donación inválida
         self.assertFalse(Donation.objects.filter(title='Donación inválida').exists())
         
         # Intentar crear contacto sin campos requeridos
-        with self.assertRaises(Exception):
-            Contact.objects.create(
+        with self.assertRaises(ValidationError):
+            contact = Contact(
                 # Sin first_name ni last_name (campos requeridos)
                 role="Rol sin nombre",
                 ministry="Ministerio sin nombre",
                 contact="contacto@test.com"
             )
+            contact.save()
 
     def test_performance_integration(self):
         """Prueba el rendimiento de operaciones integradas"""
