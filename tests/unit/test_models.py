@@ -1,9 +1,9 @@
 """
 Pruebas unitarias para los modelos de la aplicación
 """
-import pytest
-from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from decimal import Decimal
 from datetime import timedelta

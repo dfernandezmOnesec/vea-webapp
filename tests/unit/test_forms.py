@@ -1,8 +1,8 @@
 """
-Pruebas unitarias para los formularios de la aplicación
+Pruebas unitarias para formularios
 """
-import pytest
 from django.test import TestCase
+from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from decimal import Decimal
 

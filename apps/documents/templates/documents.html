@@ -119,7 +119,7 @@ deleteModal.addEventListener('show.bs.modal', function (event) {
   var modalTitle = deleteModal.querySelector('#docTitle');
   var form = deleteModal.querySelector('#deleteForm');
   modalTitle.textContent = docTitle;
-  form.action = '/documents/delete/' + docId + '/';
+  form.action = '{% url "documents:delete" 0 %}'.replace('0', docId);
 });
 </script>
 

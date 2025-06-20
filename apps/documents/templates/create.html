@@ -47,7 +47,7 @@
                     {% endif %}
                 </div>
                 <div class="d-flex justify-content-end gap-2">
-                    <a href="{% url 'documents:documents' %}" class="btn btn-secondary">Cancelar</a>
+                    <a href="{% url 'documents:document_list' %}" class="btn btn-secondary">Cancelar</a>
                     <button type="submit" class="btn {% if edit %}btn-primary{% else %}btn-warning text-dark{% endif %}">
                         {% if edit %}
                             <i class="fas fa-save me-1"></i> Guardar cambios

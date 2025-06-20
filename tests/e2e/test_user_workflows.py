@@ -1,7 +1,6 @@
 """
-Pruebas de extremo a extremo para flujos de trabajo de usuario
+Pruebas end-to-end para flujos de usuario
 """
-import pytest
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
