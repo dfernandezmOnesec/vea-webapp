@@ -26,19 +26,22 @@ if not all([BLOB_ACCOUNT_NAME, BLOB_ACCOUNT_KEY, BLOB_CONTAINER_NAME]):
 DEBUG = True
 
 # Base de datos PostgreSQL para desarrollo
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'vea_connect',
-        'USER': 'twsugyiaxf',
-        'PASSWORD': 'E72$rhqEdm6b9oaI',
-        'HOST': 'micrositio-vea-connect-server.rs-b76d4c4689ff.postgres.database.azure.com',
-        'PORT': '5432',
-        'OPTIONS': {
-            'sslmode': 'require'
+# Si DATABASE_URL está definida en el entorno (p. ej., en CI/CD), se usará esa.
+# De lo contrario, se usa la base de datos de desarrollo de PostgreSQL.
+if 'DATABASE_URL' not in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'vea_connect',
+            'USER': 'twsugyiaxf',
+            'PASSWORD': 'E72$rhqEdm6b9oaI',
+            'HOST': 'micrositio-vea-connect-server.rs-b76d4c4689ff.postgres.database.azure.com',
+            'PORT': '5432',
+            'OPTIONS': {
+                'sslmode': 'require'
+            }
         }
     }
-}
 
 # Archivos estáticos
 STATIC_URL = '/static/'
