@@ -1,56 +1,6 @@
 [flake8]
-exclude = 
-    venv/,
-    .venv/,
-    env/,
-    .env/,
-    staticfiles/,
-    media/,
-    migrations/,
-    __pycache__/,
-    .git/,
-    node_modules/,
-    .pytest_cache/,
-    .coverage,
-    htmlcov/,
-    .tox/,
-    .eggs/,
-    *.egg-info/,
-    build/,
-    dist/,
-    .mypy_cache/,
-    .ruff_cache/
-
-max-line-length = 120
-ignore = 
-    E501,  # line too long
-    W503,  # line break before binary operator
-    F401,  # imported but unused
-    F403,  # wildcard import
-    F405,  # name may be undefined, or defined from star imports
-    F821,  # undefined name
-    F822,  # undefined name in __all__
-    F823,  # local variable referenced before assignment
-    F824,  # global statement unused
-    E203,  # whitespace before ':'
-    W291,  # trailing whitespace
-    W292,  # no newline at end of file
-    W293,  # blank line contains whitespace
-    W391,  # blank line at end of file
-    E722,  # do not use bare except
-    E731,  # do not assign a lambda expression, use a def
-    E741,  # ambiguous variable name
-    E742,  # ambiguous class definition
-    E743,  # ambiguous function definition
-    E901,  # SyntaxError or IndentationError
-    E902,  # IOError
-    E999,  # SyntaxError
-
+ignore = E203, E501, W503, F401, F403, F405, F821
+exclude = .git,__pycache__,venv,build,dist,staticfiles,media,migrations
+max-line-length = 119
 per-file-ignores =
-    # Ignore specific files or patterns
-    __init__.py:F401
-    migrations/*:E501,F401
-    tests/*:E501,F401
-    */tests/*:E501,F401
-    */test_*.py:E501,F401
-    *_test.py:E501,F401 
+    __init__.py:F401 
