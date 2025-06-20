@@ -107,8 +107,8 @@ class ContactModelTest(TestCase):
             contact="juan@iglesia.com"
         )
         contacts = Contact.objects.all()
-        self.assertEqual(contacts[0], contact1)  # Juan Pérez (Pérez < García)
-        self.assertEqual(contacts[1], contact2)  # Ana García
+        self.assertEqual(contacts[0], contact2)  # Ana García (García < Pérez alfabéticamente)
+        self.assertEqual(contacts[1], contact1)  # Juan Pérez
 
 
 class DocumentModelTest(TestCase):

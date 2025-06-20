@@ -3,8 +3,8 @@
 from django.db import models
 
 class Contact(models.Model):
-    first_name = models.CharField(max_length=50, verbose_name="Nombre", blank=True, null=True)
-    last_name = models.CharField(max_length=50, verbose_name="Apellido", blank=True, null=True)
+    first_name = models.CharField(max_length=50, verbose_name="Nombre")
+    last_name = models.CharField(max_length=50, verbose_name="Apellido")
     role = models.CharField(max_length=100, verbose_name="Rol", blank=True, null=True)
     ministry = models.CharField(max_length=150, verbose_name="Ministerio")
     contact = models.CharField(max_length=100, verbose_name="Contacto")

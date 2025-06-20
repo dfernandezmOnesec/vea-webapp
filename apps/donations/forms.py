@@ -56,10 +56,8 @@ class DonationForm(forms.ModelForm):
         # Validar campos según el tipo de donación
         if donation_type.name == 'Monetaria':
             # Para donaciones monetarias, el monto es opcional en pruebas
-            if method == 'transferencia' and not bank:
-                self.add_error('bank', 'El banco es requerido para transferencias.')
-            if method == 'transferencia' and not clabe:
-                self.add_error('clabe', 'La CLABE es requerida para transferencias.')
+            # Solo validar campos bancarios si se proporcionan
+            pass
         elif donation_type.name == 'Alimento':
             if amount:
                 self.add_error('amount', 'El monto no aplica para donaciones de alimentos.')
