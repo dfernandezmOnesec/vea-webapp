@@ -34,7 +34,7 @@ class APIIntegrationTest(TestCase):
         # Simular carga de archivo
         test_file = SimpleUploadedFile(
             "test_integration.pdf",
-            b"contenido del archivo de integración",
+            "contenido del archivo de integración".encode('utf-8'),
             content_type="application/pdf"
         )
         
