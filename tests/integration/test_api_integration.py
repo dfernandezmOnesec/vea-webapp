@@ -3,25 +3,18 @@ Pruebas de integración para APIs
 """
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from decimal import Decimal
 import json
 from django.core.exceptions import ValidationError
-
-from apps.core.models import CustomUser
-from apps.directory.models import Contact
-from apps.documents.models import Document
-from apps.events.models import Event
-from apps.donations.models import Donation, DonationType
-
-User = get_user_model()
 
 
 class APIIntegrationTest(TestCase):
     """Pruebas de integración para APIs"""
 
     def setUp(self):
+        from apps.core.models import CustomUser
+        from apps.donations.models import DonationType
         self.user = CustomUser.objects.create_user(
             email='test@example.com',
             username='testuser',
@@ -31,6 +24,7 @@ class APIIntegrationTest(TestCase):
 
     def test_document_upload_integration(self):
         """Prueba la integración de carga de documentos"""
+        from apps.documents.models import Document
         # Simular carga de archivo
         test_file = SimpleUploadedFile(
             "test_integration.pdf",
@@ -62,6 +56,7 @@ class APIIntegrationTest(TestCase):
 
     def test_donation_calculation_integration(self):
         """Prueba la integración de cálculos de donaciones"""
+        from apps.donations.models import Donation
         # Crear múltiples donaciones
         donations = []
         amounts = [100.00, 250.50, 75.25, 500.00]
@@ -87,6 +82,7 @@ class APIIntegrationTest(TestCase):
 
     def test_event_scheduling_integration(self):
         """Prueba la integración de programación de eventos"""
+        from apps.events.models import Event
         # Crear eventos con diferentes fechas
         events = []
         event_data = [
@@ -125,6 +121,7 @@ class APIIntegrationTest(TestCase):
 
     def test_contact_directory_integration(self):
         """Prueba la integración del directorio de contactos"""
+        from apps.directory.models import Contact
         # Crear contactos de diferentes ministerios
         ministries = [
             'Ministerio de Jóvenes',
@@ -156,6 +153,7 @@ class APIIntegrationTest(TestCase):
 
     def test_user_authentication_integration(self):
         """Prueba la integración de autenticación de usuarios"""
+        from apps.core.models import CustomUser
         # Crear usuario
         user = CustomUser.objects.create_user(
             email='integration@example.com',
@@ -180,6 +178,10 @@ class APIIntegrationTest(TestCase):
 
     def test_data_consistency_integration(self):
         """Prueba la consistencia de datos entre módulos"""
+        from apps.directory.models import Contact
+        from apps.events.models import Event
+        from apps.documents.models import Document
+        from apps.donations.models import Donation
         # Crear datos relacionados
         contact = Contact.objects.create(
             first_name="Pastor",
@@ -225,6 +227,8 @@ class APIIntegrationTest(TestCase):
 
     def test_error_handling_integration(self):
         """Prueba el manejo de errores en integración"""
+        from apps.donations.models import Donation
+        from apps.directory.models import Contact
         # Intentar crear datos inválidos que realmente lancen excepciones
         with self.assertRaises(ValidationError):
             donation = Donation(
@@ -236,7 +240,7 @@ class APIIntegrationTest(TestCase):
                 entity="Banco de México",
                 created_by=self.user
             )
-            donation.save()
+            donation.full_clean()
         
         # Verificar que no se creó la donación inválida
         self.assertFalse(Donation.objects.filter(title='Donación inválida').exists())
@@ -249,10 +253,11 @@ class APIIntegrationTest(TestCase):
                 ministry="Ministerio sin nombre",
                 contact="contacto@test.com"
             )
-            contact.save()
+            contact.full_clean()
 
     def test_performance_integration(self):
         """Prueba el rendimiento de operaciones integradas"""
+        from apps.directory.models import Contact
         # Crear múltiples registros para probar rendimiento
         contacts = []
         for i in range(10):

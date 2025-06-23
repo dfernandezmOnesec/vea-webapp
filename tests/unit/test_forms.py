@@ -2,16 +2,8 @@
 Pruebas unitarias para formularios
 """
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from decimal import Decimal
-
-from apps.core.models import CustomUser
-from apps.directory.forms import ContactForm
-from apps.documents.forms import DocumentForm
-from apps.events.forms import EventForm
-from apps.donations.forms import DonationForm
-from apps.donations.models import DonationType
 
 
 class ContactFormTest(TestCase):
@@ -19,6 +11,7 @@ class ContactFormTest(TestCase):
 
     def test_contact_form_valid(self):
         """Prueba que el formulario sea válido con datos correctos"""
+        from apps.directory.forms import ContactForm
         form_data = {
             'first_name': 'Juan',
             'last_name': 'Pérez',
@@ -31,6 +24,7 @@ class ContactFormTest(TestCase):
 
     def test_contact_form_invalid_missing_required(self):
         """Prueba que el formulario sea inválido sin campos requeridos"""
+        from apps.directory.forms import ContactForm
         form_data = {
             'first_name': 'Juan',
             # Falta last_name, ministry y contact
@@ -43,6 +37,7 @@ class ContactFormTest(TestCase):
 
     def test_contact_form_save(self):
         """Prueba que el formulario guarde correctamente"""
+        from apps.directory.forms import ContactForm
         form_data = {
             'first_name': 'Juan',
             'last_name': 'Pérez',
@@ -64,6 +59,7 @@ class DocumentFormTest(TestCase):
     """Pruebas para el formulario DocumentForm"""
 
     def setUp(self):
+        from apps.core.models import CustomUser
         self.user = CustomUser.objects.create_user(
             email='test@example.com',
             username='testuser'
@@ -71,6 +67,7 @@ class DocumentFormTest(TestCase):
 
     def test_document_form_valid(self):
         """Prueba que el formulario sea válido con datos correctos"""
+        from apps.documents.forms import DocumentForm
         # Crear un archivo de prueba
         test_file = SimpleUploadedFile(
             "test.pdf",
@@ -91,6 +88,7 @@ class DocumentFormTest(TestCase):
 
     def test_document_form_invalid_missing_required(self):
         """Prueba que el formulario sea inválido sin campos requeridos"""
+        from apps.documents.forms import DocumentForm
         form_data = {
             'description': 'Descripción de prueba',
             # Falta title, file y category
@@ -103,6 +101,7 @@ class DocumentFormTest(TestCase):
 
     def test_document_form_category_choices(self):
         """Prueba las opciones de categoría válidas"""
+        from apps.documents.forms import DocumentForm
         test_file = SimpleUploadedFile(
             "test.pdf",
             b"file_content",
@@ -130,6 +129,7 @@ class DocumentFormTest(TestCase):
 
     def test_document_form_save(self):
         """Prueba que el formulario guarde correctamente"""
+        from apps.documents.forms import DocumentForm
         test_file = SimpleUploadedFile(
             "test.pdf",
             b"file_content",
@@ -160,6 +160,7 @@ class EventFormTest(TestCase):
 
     def test_event_form_valid(self):
         """Prueba que el formulario sea válido con datos correctos"""
+        from apps.events.forms import EventForm
         form_data = {
             'title': 'Evento de prueba',
             'description': 'Descripción del evento',
@@ -172,6 +173,7 @@ class EventFormTest(TestCase):
 
     def test_event_form_invalid_missing_required(self):
         """Prueba que el formulario sea inválido sin campos requeridos"""
+        from apps.events.forms import EventForm
         form_data = {
             'description': 'Descripción del evento',
             # Falta title
@@ -182,6 +184,7 @@ class EventFormTest(TestCase):
 
     def test_event_form_save(self):
         """Prueba que el formulario guarde correctamente"""
+        from apps.events.forms import EventForm
         form_data = {
             'title': 'Evento de prueba',
             'description': 'Descripción del evento',
@@ -203,6 +206,8 @@ class DonationFormTest(TestCase):
     """Pruebas para el formulario DonationForm"""
 
     def setUp(self):
+        from apps.core.models import CustomUser
+        from apps.donations.models import DonationType
         self.user = CustomUser.objects.create_user(
             email='test@example.com',
             username='testuser'
@@ -211,6 +216,7 @@ class DonationFormTest(TestCase):
 
     def test_donation_form_valid(self):
         """Prueba que el formulario sea válido con datos correctos"""
+        from apps.donations.forms import DonationForm
         form_data = {
             'title': 'Donación de prueba',
             'donation_type': self.donation_type.id,
@@ -227,6 +233,7 @@ class DonationFormTest(TestCase):
 
     def test_donation_form_invalid_missing_required(self):
         """Prueba que el formulario sea inválido sin campos requeridos"""
+        from apps.donations.forms import DonationForm
         form_data = {
             'description': 'Descripción de la donación',
             # Falta title y donation_type
@@ -238,6 +245,7 @@ class DonationFormTest(TestCase):
 
     def test_donation_form_method_choices(self):
         """Prueba las opciones de método válidas"""
+        from apps.donations.forms import DonationForm
         valid_methods = [
             'deposito',
             'transferencia',
@@ -257,6 +265,7 @@ class DonationFormTest(TestCase):
 
     def test_donation_form_save(self):
         """Prueba que el formulario guarde correctamente"""
+        from apps.donations.forms import DonationForm
         form_data = {
             'title': 'Donación de prueba',
             'donation_type': self.donation_type.id,

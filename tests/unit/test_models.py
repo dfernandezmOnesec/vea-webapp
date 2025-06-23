@@ -2,17 +2,10 @@
 Pruebas unitarias para los modelos de la aplicación
 """
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from decimal import Decimal
 from datetime import timedelta
-
-from apps.core.models import CustomUser
-from apps.directory.models import Contact
-from apps.documents.models import Document
-from apps.events.models import Event
-from apps.donations.models import Donation, DonationType
 
 
 class CustomUserModelTest(TestCase):
@@ -20,6 +13,7 @@ class CustomUserModelTest(TestCase):
 
     def test_create_user(self):
         """Prueba la creación de un usuario normal"""
+        from apps.core.models import CustomUser
         user = CustomUser.objects.create_user(
             email='test@example.com',
             username='testuser',
@@ -33,6 +27,7 @@ class CustomUserModelTest(TestCase):
 
     def test_create_superuser(self):
         """Prueba la creación de un superusuario"""
+        from apps.core.models import CustomUser
         admin = CustomUser.objects.create_superuser(
             email='admin@example.com',
             username='admin',
@@ -44,6 +39,7 @@ class CustomUserModelTest(TestCase):
 
     def test_user_string_representation(self):
         """Prueba la representación en string del usuario"""
+        from apps.core.models import CustomUser
         user = CustomUser.objects.create_user(
             email='test@example.com',
             username='testuser'
@@ -52,6 +48,7 @@ class CustomUserModelTest(TestCase):
 
     def test_user_email_unique(self):
         """Prueba que el email sea único"""
+        from apps.core.models import CustomUser
         CustomUser.objects.create_user(
             email='test@example.com',
             username='testuser1'
@@ -68,6 +65,7 @@ class ContactModelTest(TestCase):
 
     def test_create_contact(self):
         """Prueba la creación de un contacto"""
+        from apps.directory.models import Contact
         contact = Contact.objects.create(
             first_name="Juan",
             last_name="Pérez",
@@ -84,6 +82,7 @@ class ContactModelTest(TestCase):
 
     def test_contact_string_representation(self):
         """Prueba la representación en string del contacto"""
+        from apps.directory.models import Contact
         contact = Contact.objects.create(
             first_name="Juan",
             last_name="Pérez",
@@ -94,6 +93,7 @@ class ContactModelTest(TestCase):
 
     def test_contact_ordering(self):
         """Prueba el ordenamiento de contactos por apellido y nombre"""
+        from apps.directory.models import Contact
         contact2 = Contact.objects.create(
             first_name="Ana",
             last_name="García",
@@ -115,6 +115,7 @@ class DocumentModelTest(TestCase):
     """Pruebas para el modelo Document"""
 
     def setUp(self):
+        from apps.core.models import CustomUser
         self.user = CustomUser.objects.create_user(
             email='test@example.com',
             username='testuser'
@@ -122,6 +123,7 @@ class DocumentModelTest(TestCase):
 
     def test_create_document(self):
         """Prueba la creación de un documento"""
+        from apps.documents.models import Document
         document = Document.objects.create(
             title="Documento de prueba",
             description="Descripción de prueba",
@@ -137,6 +139,7 @@ class DocumentModelTest(TestCase):
 
     def test_document_string_representation(self):
         """Prueba la representación en string del documento"""
+        from apps.documents.models import Document
         document = Document.objects.create(
             title="Documento de prueba",
             category="eventos_generales",
@@ -146,6 +149,7 @@ class DocumentModelTest(TestCase):
 
     def test_document_ordering(self):
         """Prueba el ordenamiento de documentos por fecha"""
+        from apps.documents.models import Document
         # Crear documentos con fechas diferentes
         old_date = timezone.now() - timedelta(days=1)
         recent_date = timezone.now()
@@ -168,6 +172,7 @@ class DocumentModelTest(TestCase):
 
     def test_document_category_choices(self):
         """Prueba las opciones de categoría válidas"""
+        from apps.documents.models import Document
         valid_categories = [
             "eventos_generales",
             "ministerios", 
@@ -189,6 +194,7 @@ class EventModelTest(TestCase):
 
     def test_create_event(self):
         """Prueba la creación de un evento"""
+        from apps.events.models import Event
         event = Event.objects.create(
             title="Evento de prueba",
             description="Descripción del evento",
@@ -206,6 +212,7 @@ class EventModelTest(TestCase):
 
     def test_event_string_representation(self):
         """Prueba la representación en string del evento"""
+        from apps.events.models import Event
         event = Event.objects.create(
             title="Evento de prueba",
             date="2024-12-25"
@@ -214,6 +221,7 @@ class EventModelTest(TestCase):
 
     def test_event_ordering(self):
         """Prueba el ordenamiento de eventos por fecha y hora"""
+        from apps.events.models import Event
         event1 = Event.objects.create(
             title="Evento antiguo",
             date="2024-12-24",
@@ -234,16 +242,19 @@ class DonationTypeModelTest(TestCase):
 
     def test_create_donation_type(self):
         """Prueba la creación de un tipo de donación"""
+        from apps.donations.models import DonationType
         donation_type = DonationType.objects.create(name="Monetaria")
         self.assertEqual(donation_type.name, "Monetaria")
 
     def test_donation_type_string_representation(self):
         """Prueba la representación en string del tipo de donación"""
+        from apps.donations.models import DonationType
         donation_type = DonationType.objects.create(name="En especie")
         self.assertEqual(str(donation_type), "En especie")
 
     def test_donation_type_unique_name(self):
         """Prueba que el nombre del tipo de donación sea único"""
+        from apps.donations.models import DonationType
         DonationType.objects.create(name="Monetaria")
         with self.assertRaises(Exception):
             DonationType.objects.create(name="Monetaria")
@@ -253,6 +264,8 @@ class DonationModelTest(TestCase):
     """Pruebas para el modelo Donation"""
 
     def setUp(self):
+        from apps.core.models import CustomUser
+        from apps.donations.models import DonationType
         self.user = CustomUser.objects.create_user(
             email='test@example.com',
             username='testuser'
@@ -261,6 +274,7 @@ class DonationModelTest(TestCase):
 
     def test_create_donation(self):
         """Prueba la creación de una donación"""
+        from apps.donations.models import Donation
         donation = Donation.objects.create(
             title="Donación de prueba",
             donation_type=self.donation_type,
@@ -285,8 +299,21 @@ class DonationModelTest(TestCase):
         self.assertEqual(donation.created_by, self.user)
         self.assertIsNotNone(donation.created_at)
 
+    def test_donation_negative_amount_validation(self):
+        """Prueba que no se pueda crear una donación con monto negativo"""
+        from apps.donations.models import Donation
+        with self.assertRaises(ValidationError):
+            donation = Donation(
+                title="Donación negativa",
+                donation_type=self.donation_type,
+                amount=Decimal('-100.00'),
+                created_by=self.user
+            )
+            donation.full_clean()  # Lanzará ValidationError
+
     def test_donation_string_representation(self):
         """Prueba la representación en string de la donación"""
+        from apps.donations.models import Donation
         donation = Donation.objects.create(
             title="Donación de prueba",
             donation_type=self.donation_type,
@@ -297,6 +324,7 @@ class DonationModelTest(TestCase):
 
     def test_donation_ordering(self):
         """Prueba el ordenamiento de donaciones por fecha de creación"""
+        from apps.donations.models import Donation
         donation1 = Donation.objects.create(
             title="Donación antigua",
             donation_type=self.donation_type,
@@ -313,6 +341,7 @@ class DonationModelTest(TestCase):
 
     def test_donation_method_choices(self):
         """Prueba las opciones de método válidas"""
+        from apps.donations.models import Donation
         valid_methods = [
             'deposito',
             'transferencia',
@@ -320,6 +349,7 @@ class DonationModelTest(TestCase):
             'ministerio',
             'entrega_directa'
         ]
+        
         for method in valid_methods:
             donation = Donation.objects.create(
                 title=f"Donación {method}",
@@ -331,6 +361,7 @@ class DonationModelTest(TestCase):
 
     def test_donation_type_choices(self):
         """Prueba las opciones de tipo válidas"""
+        from apps.donations.models import DonationType, Donation
         valid_types = [
             'monetaria',
             'especie',
@@ -339,7 +370,7 @@ class DonationModelTest(TestCase):
             'otros'
         ]
         for donation_type_name in valid_types:
-            donation_type = DonationType.objects.create(name=donation_type_name)
+            donation_type, _ = DonationType.objects.get_or_create(name=donation_type_name)
             donation = Donation.objects.create(
                 title=f"Donación {donation_type_name}",
                 donation_type=donation_type,

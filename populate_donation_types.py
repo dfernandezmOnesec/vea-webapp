@@ -2,7 +2,7 @@ from apps.donations.models import DonationType
 
 def populate_types():
     tipos = [
-        'Diezmo/Ofrenda',
+        'Ofrenda',
         'Alimento',
         'Ropa',
         'Material Bíblico',

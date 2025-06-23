@@ -3,33 +3,29 @@ Pruebas end-to-end para flujos de usuario
 """
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from decimal import Decimal
-
-from apps.core.models import CustomUser
-from apps.directory.models import Contact
-from apps.documents.models import Document
-from apps.events.models import Event
-from apps.donations.models import Donation, DonationType
-
-User = get_user_model()
+from django.utils import timezone
 
 
 class UserWorkflowTest(TestCase):
     """Pruebas de flujos de trabajo completos de usuario"""
 
     def setUp(self):
+        from apps.core.models import CustomUser
+        from apps.donations.models import DonationType
         self.client = Client()
         self.user = CustomUser.objects.create_user(
             email='test@example.com',
             username='testuser',
             password='testpass123'
         )
+        self.client.force_login(self.user)
         self.donation_type = DonationType.objects.create(name="Monetaria")
 
     def test_complete_contact_workflow(self):
         """Prueba el flujo completo de gestión de contactos"""
+        from apps.directory.models import Contact
         # 1. Acceder a la lista de contactos
         response = self.client.get(reverse('directory:list'))
         self.assertEqual(response.status_code, 200)
@@ -37,7 +33,8 @@ class UserWorkflowTest(TestCase):
 
         # 2. Crear un nuevo contacto
         contact_data = {
-            'name': 'María González',
+            'first_name': 'María',
+            'last_name': 'González',
             'role': 'Líder de Ministerio',
             'ministry': 'Ministerio de Mujeres',
             'contact': 'maria@iglesia.com'
@@ -52,7 +49,8 @@ class UserWorkflowTest(TestCase):
 
         # 4. Editar el contacto
         edit_data = {
-            'name': 'María González',
+            'first_name': 'María',
+            'last_name': 'González',
             'role': 'Coordinadora de Ministerio',
             'ministry': 'Ministerio de Mujeres',
             'contact': 'maria@iglesia.com'
@@ -73,10 +71,11 @@ class UserWorkflowTest(TestCase):
 
     def test_complete_document_workflow(self):
         """Prueba el flujo completo de gestión de documentos"""
+        from apps.documents.models import Document
         # 1. Acceder a la lista de documentos
         response = self.client.get(reverse('documents:document_list'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'documents/documents.html')
+        self.assertTemplateUsed(response, 'documents.html')
 
         # 2. Crear un nuevo documento
         test_file = SimpleUploadedFile(
@@ -87,12 +86,10 @@ class UserWorkflowTest(TestCase):
         document_data = {
             'title': 'Documento de prueba E2E',
             'description': 'Descripción del documento de prueba',
-            'category': 'eventos_generales'
-        }
-        files = {
+            'category': 'eventos_generales',
             'file': test_file
         }
-        response = self.client.post(reverse('documents:create'), document_data, files=files)
+        response = self.client.post(reverse('documents:create'), document_data)
         self.assertEqual(response.status_code, 302)
 
         # 3. Verificar que el documento se creó
@@ -123,6 +120,7 @@ class UserWorkflowTest(TestCase):
 
     def test_complete_event_workflow(self):
         """Prueba el flujo completo de gestión de eventos"""
+        from apps.events.models import Event
         # 1. Acceder a la lista de eventos
         response = self.client.get(reverse('events:events'))
         self.assertEqual(response.status_code, 200)
@@ -171,6 +169,7 @@ class UserWorkflowTest(TestCase):
 
     def test_complete_donation_workflow(self):
         """Prueba el flujo completo de gestión de donaciones"""
+        from apps.donations.models import Donation
         # 1. Acceder a la lista de donaciones
         response = self.client.get(reverse('donations:list'))
         self.assertEqual(response.status_code, 200)
@@ -224,9 +223,14 @@ class UserWorkflowTest(TestCase):
 
     def test_cross_module_integration(self):
         """Prueba la integración entre diferentes módulos"""
+        from apps.directory.models import Contact
+        from apps.events.models import Event
+        from apps.documents.models import Document
+        from apps.donations.models import Donation
         # 1. Crear datos en diferentes módulos
         contact = Contact.objects.create(
-            name="Pastor Juan",
+            first_name="Pastor",
+            last_name="Juan",
             role="Pastor Principal",
             ministry="Ministerio General",
             contact="pastor@iglesia.com"
@@ -241,10 +245,15 @@ class UserWorkflowTest(TestCase):
         )
 
         document = Document.objects.create(
-            title="Programa de Conferencia",
+            title="Minuta de la Conferencia",
             description="Programa detallado de la conferencia",
             category="eventos_generales",
-            user=self.user
+            user=self.user,
+            file=SimpleUploadedFile(
+                "minuta.pdf",
+                b"contenido de la minuta",
+                content_type="application/pdf"
+            )
         )
 
         donation = Donation.objects.create(
@@ -260,7 +269,7 @@ class UserWorkflowTest(TestCase):
         # 2. Verificar que todos los datos están disponibles
         self.assertTrue(Contact.objects.filter(first_name="Pastor", last_name="Juan").exists())
         self.assertTrue(Event.objects.filter(title="Conferencia General").exists())
-        self.assertTrue(Document.objects.filter(title="Programa de Conferencia").exists())
+        self.assertTrue(Document.objects.filter(title="Minuta de la Conferencia").exists())
         self.assertTrue(Donation.objects.filter(title="Donación para Conferencia").exists())
 
         # 3. Verificar que las vistas principales muestran los datos
@@ -271,20 +280,43 @@ class UserWorkflowTest(TestCase):
         self.assertContains(response, "Conferencia General")
 
         response = self.client.get(reverse('documents:document_list'))
-        self.assertContains(response, "Programa de Conferencia")
+        self.assertContains(response, "Minuta de la Conferencia")
 
         response = self.client.get(reverse('donations:list'))
         self.assertContains(response, "Donación para Conferencia")
 
+        # Verificar que todos los datos están relacionados lógicamente
+        self.assertIn("Pastor", contact.role)
+        self.assertIn("Conferencia", event.title)
+        self.assertIn("Minuta", document.title)
+        self.assertIn("Donación", donation.title)
+        
+        # Verificar que las fechas son consistentes
+        self.assertEqual(str(event.date), "2024-12-25")
+
+        # Test cross-module integration (e.g., creating an event related to a contact)
+        event_data = {
+            'title': 'Reunión con ' + contact.first_name,
+            'description': 'Discutir proyecto importante',
+            'date': timezone.now().date(),
+        }
+        event = Event.objects.create(
+            title=event_data['title'],
+            description=event_data['description'],
+            date=event_data['date']
+        )
+        self.assertIn(contact.first_name, event.title)
+
     def test_error_handling_workflow(self):
         """Prueba el manejo de errores en flujos de trabajo"""
+        from apps.directory.models import Contact
         # 1. Intentar acceder a un contacto que no existe
         response = self.client.get(reverse('directory:edit', args=[99999]))
         self.assertEqual(response.status_code, 404)
 
         # 2. Intentar enviar datos inválidos
         invalid_data = {
-            'name': '',  # Campo requerido vacío
+            'first_name': '',  # Campo requerido vacío
             'ministry': 'Ministerio de Jóvenes'
         }
         response = self.client.post(reverse('directory:create'), invalid_data)

@@ -3,23 +3,15 @@ Pruebas funcionales para las vistas de la aplicación
 """
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from decimal import Decimal
-
-from apps.core.models import CustomUser
-from apps.directory.models import Contact
-from apps.documents.models import Document
-from apps.events.models import Event
-from apps.donations.models import Donation, DonationType
-
-User = get_user_model()
 
 
 class CoreViewsTest(TestCase):
     """Pruebas para las vistas del core"""
 
     def setUp(self):
+        from apps.core.models import CustomUser
         self.client = Client()
         self.user = CustomUser.objects.create_user(
             email='test@example.com',
@@ -45,6 +37,8 @@ class DirectoryViewsTest(TestCase):
     """Pruebas para las vistas del directorio"""
 
     def setUp(self):
+        from apps.core.models import CustomUser
+        from apps.directory.models import Contact
         self.client = Client()
         self.user = CustomUser.objects.create_user(
             email='test@example.com',
@@ -75,6 +69,7 @@ class DirectoryViewsTest(TestCase):
 
     def test_contact_create_view_post(self):
         """Prueba la vista de creación de contacto (POST)"""
+        from apps.directory.models import Contact
         data = {
             'first_name': 'Ana',
             'last_name': 'García',
@@ -96,6 +91,7 @@ class DirectoryViewsTest(TestCase):
 
     def test_contact_edit_view_post(self):
         """Prueba la vista de edición de contacto (POST)"""
+        from apps.directory.models import Contact
         data = {
             'first_name': 'Juan',
             'last_name': 'Pérez Actualizado',
@@ -117,6 +113,7 @@ class DirectoryViewsTest(TestCase):
 
     def test_contact_delete_view_post(self):
         """Prueba la vista de eliminación de contacto (POST)"""
+        from apps.directory.models import Contact
         response = self.client.post(reverse('directory:delete', args=[self.contact.pk]))
         self.assertEqual(response.status_code, 302)  # Redirect
         self.assertFalse(Contact.objects.filter(pk=self.contact.pk).exists())
@@ -126,6 +123,8 @@ class DocumentsViewsTest(TestCase):
     """Pruebas para las vistas de documentos"""
 
     def setUp(self):
+        from apps.core.models import CustomUser
+        from apps.documents.models import Document
         self.client = Client()
         self.user = CustomUser.objects.create_user(
             email='test@example.com',
@@ -164,6 +163,7 @@ class DocumentsViewsTest(TestCase):
 
     def test_document_create_view_post(self):
         """Prueba la vista de creación de documento (POST)"""
+        from apps.documents.models import Document
         test_file = SimpleUploadedFile(
             "test.pdf",
             b"file_content",
@@ -196,6 +196,7 @@ class DocumentsViewsTest(TestCase):
 
     def test_document_edit_view_post(self):
         """Prueba la vista de edición de documento (POST)"""
+        from apps.documents.models import Document
         data = {
             'title': 'Documento actualizado',
             'description': 'Descripción actualizada',
@@ -217,6 +218,7 @@ class DocumentsViewsTest(TestCase):
 
     def test_document_delete_view_post(self):
         """Prueba la vista de eliminación de documento (POST)"""
+        from apps.documents.models import Document
         response = self.client.post(reverse('documents:delete', args=[self.document.pk]))
         self.assertEqual(response.status_code, 302)  # Redirect
         self.assertFalse(Document.objects.filter(pk=self.document.pk).exists())
@@ -226,6 +228,8 @@ class EventsViewsTest(TestCase):
     """Pruebas para las vistas de eventos"""
 
     def setUp(self):
+        from apps.core.models import CustomUser
+        from apps.events.models import Event
         self.client = Client()
         self.user = CustomUser.objects.create_user(
             email='test@example.com',
@@ -262,6 +266,7 @@ class EventsViewsTest(TestCase):
 
     def test_event_create_view_post(self):
         """Prueba la vista de creación de evento (POST)"""
+        from apps.events.models import Event
         data = {
             'title': 'Nuevo evento',
             'description': 'Descripción del nuevo evento',
@@ -282,6 +287,7 @@ class EventsViewsTest(TestCase):
 
     def test_event_edit_view_post(self):
         """Prueba la vista de edición de evento (POST)"""
+        from apps.events.models import Event
         data = {
             'title': 'Evento actualizado',
             'description': 'Descripción actualizada',
@@ -302,6 +308,7 @@ class EventsViewsTest(TestCase):
 
     def test_event_delete_view_post(self):
         """Prueba la vista de eliminación de evento (POST)"""
+        from apps.events.models import Event
         response = self.client.post(reverse('events:delete', args=[self.event.pk]))
         self.assertEqual(response.status_code, 302)  # Redirect
         self.assertFalse(Event.objects.filter(pk=self.event.pk).exists())
@@ -311,6 +318,8 @@ class DonationsViewsTest(TestCase):
     """Pruebas para las vistas de donaciones"""
 
     def setUp(self):
+        from apps.core.models import CustomUser
+        from apps.donations.models import Donation, DonationType
         self.client = Client()
         self.user = CustomUser.objects.create_user(
             email='test@example.com',
@@ -320,16 +329,17 @@ class DonationsViewsTest(TestCase):
         self.client.force_login(self.user)
         
         # Crear tipo de donación
-        self.donation_type = DonationType.objects.create(
-            name="Ofrenda"
-        )
+        self.donation_type = DonationType.objects.create(name="Monetaria")
         
         self.donation = Donation.objects.create(
             title="Donación de prueba",
-            description="Descripción de la donación de prueba",
-            amount=Decimal('100.00'),
             donation_type=self.donation_type,
-            entity="Iglesia Central",
+            amount=Decimal('100.00'),
+            description="Descripción de la donación de prueba",
+            method="transferencia",
+            entity="Banco",
+            bank="Banco Ejemplo",
+            clabe="123456789012345678",
             created_by=self.user
         )
 
@@ -348,11 +358,11 @@ class DonationsViewsTest(TestCase):
 
     def test_donation_create_view_post(self):
         """Prueba la vista de creación de donación (POST)"""
+        from apps.donations.models import Donation
         data = {
             'title': 'Nueva donación',
             'donation_type': self.donation_type.id,
             'description': 'Descripción de la nueva donación'
-            # No se envía amount, method, entity
         }
         response = self.client.post(reverse('donations:create'), data)
         self.assertEqual(response.status_code, 302)  # Redirect
@@ -360,10 +370,12 @@ class DonationsViewsTest(TestCase):
 
     def test_donation_create_view_post_sin_monto_ni_banco(self):
         """Prueba la creación de donación sin monto, método, banco ni entidad"""
+        from apps.donations.models import Donation
         data = {
             'title': 'Donación sin monto',
             'donation_type': self.donation_type.id,
-            'description': 'Solo descripción'
+            'description': 'Descripción de la nueva donación'
+            # No se envía amount, method, entity
         }
         response = self.client.post(reverse('donations:create'), data)
         self.assertEqual(response.status_code, 302)
@@ -378,10 +390,11 @@ class DonationsViewsTest(TestCase):
 
     def test_donation_edit_view_post(self):
         """Prueba la vista de edición de donación (POST)"""
+        from apps.donations.models import Donation
         data = {
             'title': 'Donación actualizada',
             'donation_type': self.donation_type.id,
-            'amount': '150.00',
+            'amount': '200.00',
             'description': 'Descripción actualizada',
             'method': 'deposito',
             'entity': 'Banco de México'
@@ -389,6 +402,7 @@ class DonationsViewsTest(TestCase):
         response = self.client.post(reverse('donations:edit', args=[self.donation.pk]), data)
         self.assertEqual(response.status_code, 302)  # Redirect
         self.donation.refresh_from_db()
+        self.assertEqual(self.donation.amount, Decimal('200.00'))
         self.assertEqual(self.donation.title, 'Donación actualizada')
 
     def test_donation_delete_view_get(self):
@@ -399,6 +413,7 @@ class DonationsViewsTest(TestCase):
 
     def test_donation_delete_view_post(self):
         """Prueba la vista de eliminación de donación (POST)"""
+        from apps.donations.models import Donation
         response = self.client.post(reverse('donations:delete', args=[self.donation.pk]))
         self.assertEqual(response.status_code, 302)  # Redirect
         self.assertFalse(Donation.objects.filter(pk=self.donation.pk).exists())
@@ -408,6 +423,7 @@ class DashboardViewsTest(TestCase):
     """Pruebas para las vistas del dashboard"""
 
     def setUp(self):
+        from apps.core.models import CustomUser
         self.client = Client()
         self.user = CustomUser.objects.create_user(
             email='test@example.com',
@@ -427,6 +443,7 @@ class UserSettingsViewsTest(TestCase):
     """Pruebas para las vistas de configuración de usuario"""
 
     def setUp(self):
+        from apps.core.models import CustomUser
         self.client = Client()
         self.user = CustomUser.objects.create_user(
             email='test@example.com',

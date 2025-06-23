@@ -2,15 +2,7 @@
 Configuración de pytest y fixtures comunes para todas las pruebas
 """
 import pytest
-from django.contrib.auth import get_user_model
 from django.test import Client
-from apps.core.models import CustomUser
-from apps.directory.models import Contact
-from apps.documents.models import Document
-from apps.events.models import Event
-from apps.donations.models import Donation, DonationType
-
-User = get_user_model()
 
 
 @pytest.fixture
@@ -20,8 +12,11 @@ def client():
 
 
 @pytest.fixture
+@pytest.mark.django_db
 def test_user():
     """Usuario de prueba"""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
     return User.objects.create_user(
         email='test@example.com',
         username='testuser',
@@ -30,8 +25,11 @@ def test_user():
 
 
 @pytest.fixture
+@pytest.mark.django_db
 def admin_user():
     """Usuario administrador de prueba"""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
     return User.objects.create_superuser(
         email='admin@example.com',
         username='admin',
@@ -54,8 +52,10 @@ def admin_client(client, admin_user):
 
 
 @pytest.fixture
+@pytest.mark.django_db
 def sample_contact():
     """Contacto de prueba"""
+    from apps.directory.models import Contact
     return Contact.objects.create(
         first_name="Juan",
         last_name="Pérez",
@@ -66,8 +66,10 @@ def sample_contact():
 
 
 @pytest.fixture
+@pytest.mark.django_db
 def sample_document(test_user):
     """Documento de prueba"""
+    from apps.documents.models import Document
     return Document.objects.create(
         title="Documento de prueba",
         description="Descripción de prueba",
@@ -77,8 +79,10 @@ def sample_document(test_user):
 
 
 @pytest.fixture
+@pytest.mark.django_db
 def sample_event():
     """Evento de prueba"""
+    from apps.events.models import Event
     return Event.objects.create(
         title="Evento de prueba",
         description="Descripción del evento",
@@ -89,14 +93,18 @@ def sample_event():
 
 
 @pytest.fixture
+@pytest.mark.django_db
 def sample_donation_type():
     """Tipo de donación de prueba"""
+    from apps.donations.models import DonationType
     return DonationType.objects.create(name="Monetaria")
 
 
 @pytest.fixture
+@pytest.mark.django_db
 def sample_donation(test_user, sample_donation_type):
     """Donación de prueba"""
+    from apps.donations.models import Donation
     return Donation.objects.create(
         title="Donación de prueba",
         donation_type=sample_donation_type,

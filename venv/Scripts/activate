@@ -35,7 +35,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\DianaFernándezMadrig\OneDrive - ONESEC\Documentos\Entorno VS\Projectos IA\VEA\vea-webapp\venv"
+VIRTUAL_ENV="C:\Proyectos\vea-webapp\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

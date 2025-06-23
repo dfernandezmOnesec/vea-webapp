@@ -4,6 +4,32 @@
 
 {% block title %}Iniciar Sesión - VEA Connect{% endblock %}
 
+{% block extra_css %}
+<style>
+/* Ocultar el icono de revelación de contraseña predeterminado de Edge/IE */
+input[type="password"]::-ms-reveal {
+    display: none;
+}
+
+/* Para otros navegadores basados en WebKit (aunque no es un estándar) */
+input[type="password"]::-webkit-password-suffix {
+    display: none;
+}
+
+.password-toggle {
+    position: relative;
+}
+
+.password-toggle .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 18px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+</style>
+{% endblock %}
+
 {% block form_title %}Iniciar Sesión{% endblock %}
 
 {% block form_content %}
@@ -13,10 +39,10 @@
         <label for="id_username">Usuario o Email</label>
         <input type="text" name="username" id="id_username" class="form-control" placeholder="Ingresa tu usuario o email" required autofocus>
     </div>
-    <div class="form-group password-toggle" style="position:relative;">
+    <div class="form-group password-toggle">
         <label for="id_password">Contraseña</label>
         <input type="password" name="password" id="id_password" class="form-control" placeholder="Ingresa tu contraseña" required>
-        <span class="toggle-password" data-target="id_password" onclick="togglePassword('id_password')" style="position:absolute;right:18px;top:50%;transform:translateY(-50%);cursor:pointer;">
+        <span class="toggle-password" data-target="id_password" onclick="togglePassword('id_password')">
             <i class="fa fa-eye"></i>
         </span>
     </div>
