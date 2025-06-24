@@ -95,7 +95,7 @@ deleteModal.addEventListener('show.bs.modal', function (event) {
   var modalName = deleteModal.querySelector('#contactName');
   var form = deleteModal.querySelector('#deleteForm');
   modalName.textContent = contactName;
-  form.action = '/directory/delete/' + contactId + '/';
+  form.action = "{% url 'directory:delete' 0 %}".replace('0', contactId);
 });
 </script>
 {% endblock %} 
