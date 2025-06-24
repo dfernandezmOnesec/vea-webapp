@@ -3,40 +3,26 @@
 from django.db import migrations
 
 def populate_contact_names(apps, schema_editor):
-    """Populate first_name and last_name from existing name field"""
+    """Populate first_name and last_name for contacts that don't have them"""
     Contact = apps.get_model('directory', 'Contact')
     
-    # Get all contacts that have a name but no first_name
-    contacts = Contact.objects.filter(name__isnull=False).exclude(name='')
+    # Get all contacts that don't have first_name or last_name set
+    contacts = Contact.objects.filter(
+        first_name__isnull=True, 
+        last_name__isnull=True
+    )
     
     for contact in contacts:
-        # Split the name into first and last name
-        name_parts = contact.name.strip().split(' ', 1)
-        
-        if len(name_parts) >= 2:
-            contact.first_name = name_parts[0]
-            contact.last_name = name_parts[1]
-        else:
-            # If only one name, put it in first_name
-            contact.first_name = name_parts[0]
-            contact.last_name = ''
-        
+        # Since we don't have the original name field, we'll set default values
+        # This is a fallback for any contacts that might not have been properly migrated
+        contact.first_name = "Sin nombre"
+        contact.last_name = ""
         contact.save()
 
 def reverse_populate_contact_names(apps, schema_editor):
-    """Reverse operation - combine first_name and last_name back to name"""
-    Contact = apps.get_model('directory', 'Contact')
-    
-    contacts = Contact.objects.all()
-    
-    for contact in contacts:
-        if contact.first_name and contact.last_name:
-            contact.name = f"{contact.first_name} {contact.last_name}".strip()
-        elif contact.first_name:
-            contact.name = contact.first_name
-        else:
-            contact.name = ''
-        contact.save()
+    """Reverse operation - this is a no-op since we can't restore the original name"""
+    # This is intentionally empty since we can't restore the original name field
+    pass
 
 class Migration(migrations.Migration):
 

@@ -12,11 +12,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='contact',
             name='first_name',
-            field=models.CharField(max_length=100, verbose_name='Nombre'),
+            field=models.CharField(max_length=50, verbose_name='Nombre'),
         ),
         migrations.AlterField(
             model_name='contact',
             name='last_name',
-            field=models.CharField(max_length=100, verbose_name='Apellido'),
+            field=models.CharField(max_length=50, verbose_name='Apellido'),
         ),
     ] 
