@@ -31,7 +31,7 @@ class Document(models.Model):
 
     @property
     def sas_url(self):
-        """Devuelve una URL SAS temporal para el archivo en Azure Blob Storage solo si el blob existe."""
+        """Devuelve una URL SAS temporal para el archivo en Azure Blob Storage (sin verificar existencia)."""
         if not self.file:
             return None
         account_name = settings.BLOB_ACCOUNT_NAME
@@ -40,12 +40,6 @@ class Document(models.Model):
         blob_name = self.file.name
         try:
             from azure.storage.blob import generate_blob_sas, BlobSasPermissions
-            from utilities.azureblobstorage import get_blob_service_client
-            blob_service_client = get_blob_service_client()
-            container_client = blob_service_client.get_container_client(container_name)
-            blob_client = container_client.get_blob_client(blob_name)
-            if not blob_client.exists():
-                return None
             sas_token = generate_blob_sas(
                 account_name=account_name,
                 container_name=container_name,

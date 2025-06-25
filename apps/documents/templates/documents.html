@@ -79,9 +79,9 @@
                             <label class="form-label">Categoría</label>
                             <select name="category" class="form-select">
                                 <option value="">Todas</option>
-                                <option value="ministerios" {% if 'ministerios' in selected_categories %}selected{% endif %}>Ministerios</option>
-                                <option value="formacion" {% if 'formacion' in selected_categories %}selected{% endif %}>Formación</option>
-                                <option value="eventos" {% if 'eventos' in selected_categories %}selected{% endif %}>Eventos</option>
+                                {% for value, label in category_choices %}
+                                    <option value="{{ value }}" {% if value == selected_category %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                         <button type="submit" class="btn w-100 d-block mx-auto" style="background-color:#1a237e; color:#fff; max-width: 200px;">Filtrar</button>

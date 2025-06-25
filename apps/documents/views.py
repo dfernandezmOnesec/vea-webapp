@@ -60,7 +60,7 @@ def document_list(request):
     if documents:
         logger.warning(f"Primer doc file.url: {getattr(documents[0].file, 'url', None)}")
     q = request.GET.get('q', '').strip()
-    categories = request.GET.getlist('category')
+    category = request.GET.get('category', '')
 
     if q:
         documents = documents.filter(
@@ -69,13 +69,17 @@ def document_list(request):
             models.Q(category__icontains=q) |
             models.Q(uploaded_at__icontains=q)
         )
-    if categories:
-        documents = documents.filter(category__in=categories)
+    if category:
+        documents = documents.filter(category=category)
+
+    # Obtener las categorías del modelo
+    category_choices = Document.CATEGORY_CHOICES
 
     return render(request, 'documents.html', {
         'documents': documents,
         'q': q,
-        'selected_categories': categories,
+        'selected_category': category,
+        'category_choices': category_choices,
         'messages': messages.get_messages(request),
     })
 
