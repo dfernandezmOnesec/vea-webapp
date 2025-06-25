@@ -7,11 +7,12 @@ from django.contrib.auth.decorators import login_required
 from .models import Document
 import mimetypes
 import datetime
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, FileResponse, Http404, HttpResponse
 from django.db import models
 from utilities.azureblobstorage import upload_to_blob, trigger_document_processing
 from django.conf import settings
 import logging
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -104,3 +105,22 @@ def delete_document(request, pk):
         messages.success(request, 'Documento eliminado correctamente.')
         return redirect('documents:document_list')
     return render(request, 'documents/confirm_delete.html', {'document': document})
+
+@login_required
+def download_document(request, pk):
+    document = get_object_or_404(Document, pk=pk)
+    sas_url = document.sas_url
+    if not sas_url:
+        return render(request, 'documents/download_error.html', {'document': document, 'error': 'No se pudo generar la URL de descarga.'})
+    try:
+        azure_response = requests.get(sas_url, stream=True, timeout=10)
+        if azure_response.status_code == 404:
+            return render(request, 'documents/download_error.html', {'document': document, 'error': 'El archivo no existe en Azure Blob Storage.'})
+        elif not azure_response.ok:
+            return render(request, 'documents/download_error.html', {'document': document, 'error': f'Error al descargar el archivo: {azure_response.status_code}'})
+        filename = document.file.name.split('/')[-1]
+        response = HttpResponse(azure_response.raw, content_type=azure_response.headers.get('Content-Type', 'application/octet-stream'))
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+    except Exception as e:
+        return render(request, 'documents/download_error.html', {'document': document, 'error': f'Error inesperado: {str(e)}'})

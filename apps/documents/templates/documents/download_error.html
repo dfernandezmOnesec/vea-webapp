@@ -1,0 +1,16 @@
+{% extends "core/base_dashboard.html" %}
+{% block title %}Error de descarga{% endblock %}
+{% block content %}
+<div class="container mt-5" style="max-width: 500px;">
+    <div class="card shadow">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0"><i class="fa fa-exclamation-triangle me-2"></i>Error al descargar</h5>
+        </div>
+        <div class="card-body">
+            <p class="mb-3">No se pudo descargar el archivo <strong>{{ document.title }}</strong>.</p>
+            <div class="alert alert-danger">{{ error }}</div>
+            <a href="{% url 'documents:document_list' %}" class="btn btn-primary">Volver a documentos</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

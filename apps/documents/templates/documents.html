@@ -50,7 +50,7 @@
                                     <td>{{ doc.description }}</td>
                                     <td class="text-center">
                                         {% if doc.sas_url %}
-                                            <button class="btn btn-sm btn-download-blob" data-url="{{ doc.sas_url }}" style="background-color:#1a237e; color:#fff;" title="Descargar"><i class="fas fa-download"></i></button>
+                                            <a href="{% url 'documents:download' doc.pk %}" class="btn btn-sm" style="background-color:#1a237e; color:#fff;" title="Descargar"><i class="fas fa-download"></i></a>
                                         {% else %}
                                             <button class="btn btn-sm btn-secondary" title="Archivo no disponible" disabled><i class="fas fa-exclamation-triangle"></i></button>
                                         {% endif %}
