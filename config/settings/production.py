@@ -131,3 +131,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Sesiones
 # SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+
+MEDIA_URL = f"https://{AZURE_CUSTOM_DOMAIN}/{AZURE_MEDIA_CONTAINER}/"
