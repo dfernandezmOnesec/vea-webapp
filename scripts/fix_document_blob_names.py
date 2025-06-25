@@ -25,7 +25,8 @@ def blob_exists(blob_name):
     return blob_client.exists()
 
 def main():
-    print("Verificando documentos en la base de datos...")
+    print("Corrigiendo documentos en la base de datos...")
+    cambios = 0
     for doc in Document.objects.all():
         original_name = doc.file.name
         print(f"Doc {doc.pk}: file.name='{original_name}'")
@@ -39,11 +40,15 @@ def main():
         if original_name.startswith('documents/'):
             alt_name = original_name[len('documents/'):]
             if blob_exists(alt_name):
-                print(f"  ⚠ '{original_name}' NO existe, pero '{alt_name}' SÍ existe. Sugerido: actualizar en BD a '{alt_name}'")
+                print(f"  🛠 Corrigiendo: '{original_name}' → '{alt_name}' en BD...")
+                doc.file.name = alt_name
+                doc.save(update_fields=["file"])
+                cambios += 1
             else:
                 print(f"  ✗ '{original_name}' y '{alt_name}' NO existen en Azure.")
         else:
             print(f"  ✗ '{original_name}' NO existe en Azure y no tiene prefijo 'documents/'.")
+    print(f"\nTotal de documentos corregidos: {cambios}")
 
 if __name__ == "__main__":
     main() 
