@@ -6,7 +6,7 @@ azure-storage-blob==12.19.0
 dj-database-url
 psycopg2-binary
 whitenoise
-django-redis==5.4.0
+django-redis==6.0.0
 
 # Testing
 pytest==7.4.0
