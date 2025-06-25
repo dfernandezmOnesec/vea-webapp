@@ -48,7 +48,14 @@
                                     <td>{{ contact.contact }}</td>
                                     <td class="text-center">
                                         <a href="{% url 'directory:edit' contact.pk %}" class="btn btn-sm btn-warning me-1" title="Editar"><i class="fas fa-edit"></i></a>
-                                        <button class="btn btn-danger btn-sm delete-contact" data-contact-id="{{ contact.pk }}" data-contact-name="{{ contact.first_name }} {{ contact.last_name }}" title="Eliminar"><i class="fas fa-trash"></i></button>
+                                        <button class="btn btn-danger btn-sm delete-contact" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#deleteModal"
+                                                data-contact-id="{{ contact.pk }}" 
+                                                data-contact-name="{{ contact.first_name }} {{ contact.last_name }}" 
+                                                title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </td>
                                 </tr>
                                 {% empty %}
@@ -64,6 +71,7 @@
         <!-- Eliminado: col-lg-3 con filtros -->
     </div>
 </div>
+
 <!-- Modal de confirmación de borrado global -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -74,28 +82,51 @@
       </div>
       <div class="modal-body">
         <p>¿Estás seguro que deseas eliminar el contacto <strong id="contactName"></strong>?</p>
+        <p class="text-muted small">Esta acción no se puede deshacer.</p>
       </div>
       <div class="modal-footer">
         <form method="post" id="deleteForm">
           {% csrf_token %}
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-danger">Eliminar</button>
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash me-1"></i>Eliminar
+          </button>
         </form>
       </div>
     </div>
   </div>
 </div>
+
 <script>
-// Script para pasar el id y nombre al modal
-var deleteModal = document.getElementById('deleteModal');
-deleteModal.addEventListener('show.bs.modal', function (event) {
-  var button = event.relatedTarget;
-  var contactId = button.getAttribute('data-contact-id');
-  var contactName = button.getAttribute('data-contact-name');
-  var modalName = deleteModal.querySelector('#contactName');
-  var form = deleteModal.querySelector('#deleteForm');
-  modalName.textContent = contactName;
-  form.action = "{% url 'directory:delete' 0 %}".replace('0', contactId);
+document.addEventListener('DOMContentLoaded', function() {
+    // Script para pasar el id y nombre al modal
+    var deleteModal = document.getElementById('deleteModal');
+    
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var contactId = button.getAttribute('data-contact-id');
+        var contactName = button.getAttribute('data-contact-name');
+        
+        console.log('Contact ID:', contactId);
+        console.log('Contact Name:', contactName);
+        
+        var modalName = deleteModal.querySelector('#contactName');
+        var form = deleteModal.querySelector('#deleteForm');
+        
+        modalName.textContent = contactName;
+        
+        // Construir la URL correctamente
+        var deleteUrl = "{% url 'directory:delete' 0 %}".replace('0', contactId);
+        form.action = deleteUrl;
+        
+        console.log('Delete URL:', deleteUrl);
+    });
+    
+    // Manejar el envío del formulario
+    var deleteForm = document.getElementById('deleteForm');
+    deleteForm.addEventListener('submit', function(e) {
+        console.log('Form submitted to:', this.action);
+    });
 });
 </script>
 {% endblock %} 
