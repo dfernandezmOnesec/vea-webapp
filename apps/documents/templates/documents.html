@@ -50,7 +50,7 @@
                                     <td>{{ doc.description }}</td>
                                     <td class="text-center">
                                         {% if doc.sas_url %}
-                                            <a href="{{ doc.sas_url }}" class="btn btn-sm" style="background-color:#1a237e; color:#fff;" target="_blank" title="Abrir"><i class="fas fa-external-link-alt"></i></a>
+                                            <a href="{{ doc.sas_url }}" class="btn btn-sm open-blob-link" style="background-color:#1a237e; color:#fff;" target="_blank" title="Abrir"><i class="fas fa-external-link-alt"></i></a>
                                         {% else %}
                                             <button class="btn btn-sm btn-secondary" title="Archivo no disponible" disabled><i class="fas fa-exclamation-triangle"></i></button>
                                         {% endif %}
@@ -124,6 +124,47 @@ deleteModal.addEventListener('show.bs.modal', function (event) {
   var form = deleteModal.querySelector('#deleteForm');
   modalTitle.textContent = docTitle;
   form.action = '{% url "documents:delete" 0 %}'.replace('0', docId);
+});
+</script>
+
+<!-- Modal de error para blob no encontrado -->
+<div class="modal fade" id="blobNotFoundModal" tabindex="-1" aria-labelledby="blobNotFoundModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="blobNotFoundModalLabel"><i class="fa fa-exclamation-triangle me-2"></i>Error</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>No se pudo encontrar el archivo en Azure Blob Storage. Es posible que haya sido eliminado o que la referencia esté desactualizada.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// Script para mostrar modal si el blob no se encuentra (error 404)
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.open-blob-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var win = window.open(link.href, '_blank');
+            if (!win) return; // popup bloqueado
+            var check404 = setInterval(function() {
+                try {
+                    if (win.document && win.document.body && win.document.body.innerText.includes('BlobNotFound')) {
+                        win.close();
+                        clearInterval(check404);
+                        var modal = new bootstrap.Modal(document.getElementById('blobNotFoundModal'));
+                        modal.show();
+                    }
+                } catch (err) {}
+                if (win.closed) clearInterval(check404);
+            }, 700);
+        });
+    });
 });
 </script>
 
