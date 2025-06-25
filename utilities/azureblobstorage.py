@@ -121,6 +121,11 @@ def upload_to_blob(file_or_buffer, blob_name):
     file_or_buffer puede ser una ruta (str/Path) o un buffer (BytesIO).
     """
     try:
+        # Verificar si los signals de Azure están deshabilitados
+        if getattr(settings, 'DISABLE_AZURE_SIGNALS', False):
+            print(f"Azure signals deshabilitados. Omitiendo subida de {blob_name}")
+            return None
+
         print(f"Intentando subir {blob_name} a Azure Blob Storage...")
 
         if not blob_name:

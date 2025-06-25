@@ -103,7 +103,13 @@ ALLOWED_HOSTS = [
     '*',  # Temporalmente permitir todos los hosts para debugging
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['WEBSITE_HOSTNAME']]
+# Configurar CSRF_TRUSTED_ORIGINS de manera segura
+website_hostname = os.environ.get('WEBSITE_HOSTNAME')
+if website_hostname:
+    CSRF_TRUSTED_ORIGINS = [f'https://{website_hostname}']
+else:
+    # Fallback para desarrollo o cuando WEBSITE_HOSTNAME no está configurado
+    CSRF_TRUSTED_ORIGINS = ['https://localhost', 'https://127.0.0.1']
 
 # Middleware
 MIDDLEWARE = [

@@ -1,5 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.conf import settings
 from .models import Donation
 from utilities.azureblobstorage import upload_to_blob
 import json
@@ -9,6 +10,14 @@ import zipfile
 
 @receiver(post_save, sender=Donation)
 def upload_donation_to_blob(sender, instance, created, **kwargs):
+    # Verificar si los signals de Azure están deshabilitados
+    try:
+        if getattr(settings, 'DISABLE_AZURE_SIGNALS', False):
+            return
+    except:
+        # Si no se puede acceder a settings, asumir que está deshabilitado
+        return
+    
     data = {
         "id": instance.id,
         "title": getattr(instance, 'title', None),

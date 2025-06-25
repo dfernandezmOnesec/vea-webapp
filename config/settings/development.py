@@ -5,15 +5,29 @@ from .base import *
 # Cargar variables de entorno desde el archivo .env (solo en desarrollo local)
 load_dotenv()
 
-# Forzar siempre SQLite en desarrollo local
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Configuración de base de datos
+if os.getenv('CI_ENVIRONMENT') == 'true':
+    # Configuración para CI/CD
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('DBNAME', 'postgres'),
+            'USER': os.environ.get('DBUSER', 'postgres'),
+            'PASSWORD': os.environ.get('DBPASS', 'postgres'),
+            'HOST': os.environ.get('DBHOST', 'localhost'),
+            'PORT': os.environ.get('DBPORT', '5432'),
+        }
     }
-}
+else:
+    # Configuración para desarrollo local
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
-# Variables específicas de Azure Blob Storage
+# Variables específicas de Azure Blob Storage (opcionales en desarrollo)
 BLOB_ACCOUNT_NAME = os.getenv('BLOB_ACCOUNT_NAME')
 BLOB_ACCOUNT_KEY = os.getenv('BLOB_ACCOUNT_KEY')
 BLOB_CONTAINER_NAME = os.getenv('BLOB_CONTAINER_NAME')
@@ -51,5 +65,10 @@ CACHES = {
 # Sesiones en caché (opcional)
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
-# Configuración de Azure Blob Storage
-AZURE_STORAGE_CONNECTION_STRING = f"DefaultEndpointsProtocol=https;AccountName={BLOB_ACCOUNT_NAME};AccountKey={BLOB_ACCOUNT_KEY};EndpointSuffix=core.windows.net"
+# Configuración de Azure Blob Storage (solo si las variables están disponibles)
+if all([BLOB_ACCOUNT_NAME, BLOB_ACCOUNT_KEY, BLOB_CONTAINER_NAME]):
+    AZURE_STORAGE_CONNECTION_STRING = f"DefaultEndpointsProtocol=https;AccountName={BLOB_ACCOUNT_NAME};AccountKey={BLOB_ACCOUNT_KEY};EndpointSuffix=core.windows.net"
+else:
+    # Usar almacenamiento local si no hay configuración de Azure
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'

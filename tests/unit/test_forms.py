@@ -14,9 +14,9 @@ class ContactFormTest(TestCase):
         from apps.directory.forms import ContactForm
         form_data = {
             'first_name': 'Juan',
-            'last_name': 'Pérez',
+            'last_name': 'Perez',
             'role': 'Pastor',
-            'ministry': 'Ministerio de Jóvenes',
+            'ministry': 'Ministerio de Jovenes',
             'contact': 'juan@iglesia.com'
         }
         form = ContactForm(data=form_data)
@@ -40,18 +40,18 @@ class ContactFormTest(TestCase):
         from apps.directory.forms import ContactForm
         form_data = {
             'first_name': 'Juan',
-            'last_name': 'Pérez',
+            'last_name': 'Perez',
             'role': 'Pastor',
-            'ministry': 'Ministerio de Jóvenes',
+            'ministry': 'Ministerio de Jovenes',
             'contact': 'juan@iglesia.com'
         }
         form = ContactForm(data=form_data)
         self.assertTrue(form.is_valid())
         contact = form.save()
         self.assertEqual(contact.first_name, 'Juan')
-        self.assertEqual(contact.last_name, 'Pérez')
+        self.assertEqual(contact.last_name, 'Perez')
         self.assertEqual(contact.role, 'Pastor')
-        self.assertEqual(contact.ministry, 'Ministerio de Jóvenes')
+        self.assertEqual(contact.ministry, 'Ministerio de Jovenes')
         self.assertEqual(contact.contact, 'juan@iglesia.com')
 
 
@@ -77,7 +77,7 @@ class DocumentFormTest(TestCase):
         
         form_data = {
             'title': 'Documento de prueba',
-            'description': 'Descripción de prueba',
+            'description': 'Descripcion de prueba',
             'category': 'eventos_generales'
         }
         form_files = {
@@ -90,7 +90,7 @@ class DocumentFormTest(TestCase):
         """Prueba que el formulario sea inválido sin campos requeridos"""
         from apps.documents.forms import DocumentForm
         form_data = {
-            'description': 'Descripción de prueba',
+            'description': 'Descripcion de prueba',
             # Falta title, file y category
         }
         form = DocumentForm(data=form_data)
@@ -125,7 +125,7 @@ class DocumentFormTest(TestCase):
                 'file': test_file
             }
             form = DocumentForm(data=form_data, files=form_files)
-            self.assertTrue(form.is_valid(), f"Formulario inválido para categoría: {category}")
+            self.assertTrue(form.is_valid(), f"Formulario invalido para categoria: {category}")
 
     def test_document_form_save(self):
         """Prueba que el formulario guarde correctamente"""
@@ -138,7 +138,7 @@ class DocumentFormTest(TestCase):
         
         form_data = {
             'title': 'Documento de prueba',
-            'description': 'Descripción de prueba',
+            'description': 'Descripcion de prueba',
             'category': 'eventos_generales'
         }
         form_files = {
@@ -150,7 +150,7 @@ class DocumentFormTest(TestCase):
         document.user = self.user
         document.save()
         self.assertEqual(document.title, 'Documento de prueba')
-        self.assertEqual(document.description, 'Descripción de prueba')
+        self.assertEqual(document.description, 'Descripcion de prueba')
         self.assertEqual(document.category, 'eventos_generales')
         self.assertEqual(document.user, self.user)
 
@@ -163,7 +163,7 @@ class EventFormTest(TestCase):
         from apps.events.forms import EventForm
         form_data = {
             'title': 'Evento de prueba',
-            'description': 'Descripción del evento',
+            'description': 'Descripcion del evento',
             'date': '2024-12-25',
             'time': '18:00:00',
             'location': 'Iglesia Principal'
@@ -175,7 +175,7 @@ class EventFormTest(TestCase):
         """Prueba que el formulario sea inválido sin campos requeridos"""
         from apps.events.forms import EventForm
         form_data = {
-            'description': 'Descripción del evento',
+            'description': 'Descripcion del evento',
             # Falta title
         }
         form = EventForm(data=form_data)
@@ -187,7 +187,7 @@ class EventFormTest(TestCase):
         from apps.events.forms import EventForm
         form_data = {
             'title': 'Evento de prueba',
-            'description': 'Descripción del evento',
+            'description': 'Descripcion del evento',
             'date': '2024-12-25',
             'time': '18:00:00',
             'location': 'Iglesia Principal'
@@ -196,7 +196,7 @@ class EventFormTest(TestCase):
         self.assertTrue(form.is_valid())
         event = form.save()
         self.assertEqual(event.title, 'Evento de prueba')
-        self.assertEqual(event.description, 'Descripción del evento')
+        self.assertEqual(event.description, 'Descripcion del evento')
         self.assertEqual(str(event.date), '2024-12-25')
         self.assertEqual(str(event.time), '18:00:00')
         self.assertEqual(event.location, 'Iglesia Principal')
@@ -218,12 +218,12 @@ class DonationFormTest(TestCase):
         """Prueba que el formulario sea válido con datos correctos"""
         from apps.donations.forms import DonationForm
         form_data = {
-            'title': 'Donación de prueba',
+            'title': 'Donacion de prueba',
             'donation_type': self.donation_type.id,
             'amount': '100.00',
-            'description': 'Descripción de la donación',
+            'description': 'Descripcion de la donacion',
             'method': 'deposito',
-            'entity': 'Banco de México',
+            'entity': 'Banco de Mexico',
             'bank': 'Banamex',
             'clabe': '012345678901234567',
             'location': 'Sucursal Centro'
@@ -235,7 +235,7 @@ class DonationFormTest(TestCase):
         """Prueba que el formulario sea inválido sin campos requeridos"""
         from apps.donations.forms import DonationForm
         form_data = {
-            'description': 'Descripción de la donación',
+            'description': 'Descripcion de la donacion',
             # Falta title y donation_type
         }
         form = DonationForm(data=form_data)
@@ -256,33 +256,33 @@ class DonationFormTest(TestCase):
         
         for method in valid_methods:
             form_data = {
-                'title': f'Donación {method}',
+                'title': f'Donacion {method}',
                 'donation_type': self.donation_type.id,
                 'method': method
             }
             form = DonationForm(data=form_data)
-            self.assertTrue(form.is_valid(), f"Formulario inválido para método: {method}")
+            self.assertTrue(form.is_valid(), f"Formulario invalido para metodo: {method}")
 
     def test_donation_form_save(self):
         """Prueba que el formulario guarde correctamente"""
         from apps.donations.forms import DonationForm
         form_data = {
-            'title': 'Donación de prueba',
+            'title': 'Donacion de prueba',
             'donation_type': self.donation_type.id,
             'amount': '100.00',
-            'description': 'Descripción de la donación',
+            'description': 'Descripcion de la donacion',
             'method': 'deposito',
-            'entity': 'Banco de México'
+            'entity': 'Banco de Mexico'
         }
         form = DonationForm(data=form_data)
         self.assertTrue(form.is_valid())
         donation = form.save(commit=False)
         donation.created_by = self.user
         donation.save()
-        self.assertEqual(donation.title, 'Donación de prueba')
+        self.assertEqual(donation.title, 'Donacion de prueba')
         self.assertEqual(donation.donation_type, self.donation_type)
         self.assertEqual(donation.amount, Decimal('100.00'))
-        self.assertEqual(donation.description, 'Descripción de la donación')
+        self.assertEqual(donation.description, 'Descripcion de la donacion')
         self.assertEqual(donation.method, 'deposito')
-        self.assertEqual(donation.entity, 'Banco de México')
+        self.assertEqual(donation.entity, 'Banco de Mexico')
         self.assertEqual(donation.created_by, self.user) 
