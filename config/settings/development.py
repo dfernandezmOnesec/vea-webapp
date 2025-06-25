@@ -7,15 +7,14 @@ load_dotenv()
 
 # Configuración de base de datos
 if os.getenv('CI_ENVIRONMENT') == 'true':
-    # Configuración para CI/CD
+    # Configuración para CI/CD - usar SQLite para evitar dependencias externas
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('DBNAME', 'postgres'),
-            'USER': os.environ.get('DBUSER', 'postgres'),
-            'PASSWORD': os.environ.get('DBPASS', 'postgres'),
-            'HOST': os.environ.get('DBHOST', 'localhost'),
-            'PORT': os.environ.get('DBPORT', '5432'),
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3_test',
+            'OPTIONS': {
+                'timeout': 20,
+            }
         }
     }
 else:
@@ -32,15 +31,17 @@ BLOB_ACCOUNT_NAME = os.getenv('BLOB_ACCOUNT_NAME')
 BLOB_ACCOUNT_KEY = os.getenv('BLOB_ACCOUNT_KEY')
 BLOB_CONTAINER_NAME = os.getenv('BLOB_CONTAINER_NAME')
 
-# Validación de variables de entorno
-if not all([BLOB_ACCOUNT_NAME, BLOB_ACCOUNT_KEY, BLOB_CONTAINER_NAME]):
-    raise ValueError("""
-    Faltan variables de entorno necesarias para Azure Blob Storage.
-    Por favor, asegúrate de tener definidas:
-    - BLOB_ACCOUNT_NAME
-    - BLOB_ACCOUNT_KEY
-    - BLOB_CONTAINER_NAME
-    """)
+# En CI/CD, no validar las variables de Azure ya que no están disponibles
+if os.getenv('CI_ENVIRONMENT') != 'true':
+    # Validación de variables de entorno solo en desarrollo local
+    if not all([BLOB_ACCOUNT_NAME, BLOB_ACCOUNT_KEY, BLOB_CONTAINER_NAME]):
+        raise ValueError("""
+        Faltan variables de entorno necesarias para Azure Blob Storage.
+        Por favor, asegúrate de tener definidas:
+        - BLOB_ACCOUNT_NAME
+        - BLOB_ACCOUNT_KEY
+        - BLOB_CONTAINER_NAME
+        """)
 
 # Debug settings
 DEBUG = True
