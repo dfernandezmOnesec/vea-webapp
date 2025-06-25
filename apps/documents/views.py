@@ -10,6 +10,10 @@ import datetime
 from django.http import HttpResponseRedirect
 from django.db import models
 from utilities.azureblobstorage import upload_to_blob, trigger_document_processing
+from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 @login_required
 def upload_document(request):
@@ -51,6 +55,10 @@ def upload_document(request):
 @login_required
 def document_list(request):
     documents = Document.objects.all()
+    # Log temporal para depuración
+    logger.warning(f"DEFAULT_FILE_STORAGE: {getattr(settings, 'DEFAULT_FILE_STORAGE', None)}")
+    if documents:
+        logger.warning(f"Primer doc file.url: {getattr(documents[0].file, 'url', None)}")
     q = request.GET.get('q', '').strip()
     categories = request.GET.getlist('category')
 
