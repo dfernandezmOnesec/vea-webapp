@@ -32,15 +32,15 @@ def upload_document(request):
             
             # Subir el archivo a Azure Blob Storage
             file = request.FILES['file']
-            blob_name = f"documents/{file.name}" # Define una ruta/nombre para el blob
+            blob_name = file.name  # Solo el nombre del archivo, sin prefijo manual
             
             try:
-                upload_to_blob(file, blob_name)
-                document.file.name = blob_name # Guarda la referencia en el modelo
+                upload_to_blob(file, f"documents/{file.name}")
+                document.file.name = f"documents/{file.name}"  # Guarda la referencia en el modelo
                 document.save()
 
                 # Disparar la Azure Function para el procesamiento
-                trigger_document_processing(blob_name)
+                trigger_document_processing(f"documents/{file.name}")
                 
                 messages.success(request, f"El documento '{document.title}' se subió correctamente.")
                 return redirect('documents:document_list')
