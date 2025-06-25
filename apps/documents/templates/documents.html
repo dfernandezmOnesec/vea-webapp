@@ -49,7 +49,11 @@
                                     <td>{{ doc.get_category_display }}</td>
                                     <td>{{ doc.description }}</td>
                                     <td class="text-center">
-                                        <a href="{{ doc.sas_url }}" class="btn btn-sm" style="background-color:#1a237e; color:#fff;" target="_blank" title="Abrir"><i class="fas fa-external-link-alt"></i></a>
+                                        {% if doc.sas_url %}
+                                            <a href="{{ doc.sas_url }}" class="btn btn-sm" style="background-color:#1a237e; color:#fff;" target="_blank" title="Abrir"><i class="fas fa-external-link-alt"></i></a>
+                                        {% else %}
+                                            <button class="btn btn-sm btn-secondary" title="Archivo no disponible" disabled><i class="fas fa-exclamation-triangle"></i></button>
+                                        {% endif %}
                                         <a href="{% url 'documents:edit' doc.pk %}" class="btn btn-sm btn-warning me-1" title="Editar"><i class="fas fa-edit"></i></a>
                                         <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-doc-id="{{ doc.pk }}" data-doc-title="{{ doc.title }}" title="Eliminar"><i class="fas fa-trash"></i></button>
                                     </td>

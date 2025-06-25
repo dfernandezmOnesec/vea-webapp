@@ -11,6 +11,10 @@ import requests
 def get_blob_service_client():
     """Obtiene el cliente de servicio de Azure Blob Storage."""
     try:
+        # Verificar si Azure está deshabilitado
+        if getattr(settings, 'DISABLE_AZURE_SIGNALS', False):
+            raise ValueError("Azure Blob Storage está deshabilitado")
+            
         account_name = settings.BLOB_ACCOUNT_NAME
         account_key = settings.BLOB_ACCOUNT_KEY
         if not account_name or not account_key:
@@ -26,6 +30,11 @@ def get_blob_service_client():
 def upload_file(bytes_data, file_name, content_type='application/pdf'):
     """Sube un archivo a Azure Blob Storage."""
     try:
+        # Verificar si Azure está deshabilitado
+        if getattr(settings, 'DISABLE_AZURE_SIGNALS', False):
+            print(f"Azure Blob Storage deshabilitado. Omitiendo subida de {file_name}")
+            return None
+            
         container_name = settings.BLOB_CONTAINER_NAME
         if not container_name:
             raise ValueError("BLOB_CONTAINER_NAME es requerido")

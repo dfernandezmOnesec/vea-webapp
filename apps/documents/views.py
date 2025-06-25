@@ -32,21 +32,21 @@ def upload_document(request):
             
             # Subir el archivo a Azure Blob Storage
             file = request.FILES['file']
-            blob_name = file.name  # Solo el nombre del archivo, sin prefijo manual
+            blob_name = file.name
             
             try:
-                upload_to_blob(file, f"documents/{file.name}")
-                document.file.name = f"documents/{file.name}"  # Guarda la referencia en el modelo
-                document.save()
-
-                # Disparar la Azure Function para el procesamiento
-                trigger_document_processing(f"documents/{file.name}")
-                
-                messages.success(request, f"El documento '{document.title}' se subió correctamente.")
-                return redirect('documents:document_list')
+                url = upload_to_blob(file, f"documents/{file.name}")
+                if url:
+                    document.file.name = f"documents/{file.name}"  # Guarda la referencia solo si la subida fue exitosa
+                    document.save()
+                    # Disparar la Azure Function para el procesamiento
+                    trigger_document_processing(f"documents/{file.name}")
+                    messages.success(request, f"El documento '{document.title}' se subió correctamente.")
+                    return redirect('documents:document_list')
+                else:
+                    form.add_error(None, "No se pudo subir el archivo a Azure.")
             except Exception as e:
                 # Manejar el error de subida o de trigger
-                # Puedes agregar un mensaje de error para el usuario
                 form.add_error(None, f"Error al procesar el documento: {e}")
     else:
         form = DocumentForm()

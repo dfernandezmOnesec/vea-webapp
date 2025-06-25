@@ -31,17 +31,10 @@ BLOB_ACCOUNT_NAME = os.getenv('BLOB_ACCOUNT_NAME')
 BLOB_ACCOUNT_KEY = os.getenv('BLOB_ACCOUNT_KEY')
 BLOB_CONTAINER_NAME = os.getenv('BLOB_CONTAINER_NAME')
 
-# En CI/CD, no validar las variables de Azure ya que no están disponibles
-if os.getenv('CI_ENVIRONMENT') != 'true':
-    # Validación de variables de entorno solo en desarrollo local
-    if not all([BLOB_ACCOUNT_NAME, BLOB_ACCOUNT_KEY, BLOB_CONTAINER_NAME]):
-        raise ValueError("""
-        Faltan variables de entorno necesarias para Azure Blob Storage.
-        Por favor, asegúrate de tener definidas:
-        - BLOB_ACCOUNT_NAME
-        - BLOB_ACCOUNT_KEY
-        - BLOB_CONTAINER_NAME
-        """)
+# Deshabilitar Azure signals si no hay configuración completa
+if not all([BLOB_ACCOUNT_NAME, BLOB_ACCOUNT_KEY, BLOB_CONTAINER_NAME]):
+    DISABLE_AZURE_SIGNALS = True
+    print("⚠️  Azure Blob Storage no configurado. Usando almacenamiento local.")
 
 # Debug settings
 DEBUG = True
