@@ -19,8 +19,12 @@
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label for="id_name" class="form-label">Nombre</label>
-                            {{ form.name }}
+                            <label for="id_first_name" class="form-label">Nombre</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_last_name" class="form-label">Apellido</label>
+                            {{ form.last_name }}
                         </div>
                         <div class="mb-3">
                             <label for="id_role" class="form-label">Rol</label>
